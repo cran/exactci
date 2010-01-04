@@ -1,0 +1,2 @@
+export(exactbinomPvals,exactbinomCI,binom.exact,exactpoissonPvals,exactpoissonPval,exactpoissonCI,poisson.exact)
+

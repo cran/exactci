@@ -1,0 +1,87 @@
+% LaTeX Article Template
+\documentclass[12pt]{article}
+\topmargin -0.7in
+\textheight 9.0in
+%\textwidth 6in
+\textwidth 6.5in
+%\oddsidemargin 0.25in
+%\oddsidemargin -.25in
+\oddsidemargin 0.0in
+
+% \VignetteIndexEntry{exactci:Motivating example}
+% \VignetteKeyword{Confidence Interval}
+% \VignetteKeyword{Exact Test}
+
+\begin{document}
+
+\begin{center}
+{\Large \bf exactci: Exact Conditional Tests and Matching Confidence Intervals for binomial and Poisson variables} \\
+Michael P. Fay \\
+\today
+\end{center}
+
+<<echo=FALSE,results=hide,eval=T>>=
+library(exactci)
+@
+
+
+\section{Motivating Example for Package}
+\label{sec-overview}
+
+Here is a problem which motivates this package. Consider comparing the difference between two 
+exact Poisson rates. Suppose the observed rates for the two groups are $2/17877$ 
+and $10/20000$. Since the counts are low, an exact test would be appropriate. 
+In the stats package (\Sexpr{R.Version()$version.string}), we could perform 
+an exact test of the difference in Poisson rates by: 
+<<>>=
+poisson.test(c(2,10),c(17877,20000))
+@
+In Version 2.10.1, the p-value is significant at the 0.05 level ($p=0.042$),
+but the 95 percent confidence interval contains the null rate ratio of 1, $(0.024, 1.05)$.
+That is because the p-value uses one method for defining significance and the 
+confidence interval uses another method. In the 'exactci' package, the p-values 
+and confidence intervals are always derived from the same  p-value function (the p-value function has also 
+been called the confidence curve, or the evidence function (see Hirji, 2006)). 
+
+There are three methods for defining the two-sided p-values in this package given by the 'tsmethod' option:
+\begin{description}
+\item[central:]  is  2 times the minimum of the one-sided p-values bounded above by 1. 
+The name `central' is motivated by the associated inversion confidence intervals which are central intervals, 
+i.e., they guarantee that the true parameter has less than $\alpha/2$ probability of being less (more) than the lower 
+(upper) tail of the $100(1-\alpha)$\% confidence interval.  This is called the TST (twice the smaller tail method) by Hirji (2006).
+\item[minlike:]  is the sum of probabilities of outcomes with likelihoods less than or equal to the observed likelihood. 
+This is called the PB (probability based) method by Hirji (2006).
+\item[blaker:] combines the probability of the smaller observed tail with the smallest probability of the opposite tail that 
+does not exceed that observed tail probability. 
+ The name 'blaker' is motivated by Blaker (2000) which comprehensively studies the associated method for confidence intervals. 
+ This is called the CT (combined tail) method by Hirji (2006).
+\end{description}
+
+With the `exactci' package we get automatic matching confidence intervals:
+<<>>=
+library(exactci)
+poisson.exact(c(2,10),c(17877,20000),tsmethod="central")
+poisson.exact(c(2,10),c(17877,20000),tsmethod="minlike")
+poisson.exact(c(2,10),c(17877,20000),tsmethod="blaker")
+@
+
+Similar examples apply to exact binomial tests. For details see Fay (2010).
+
+\section*{References}
+
+\begin{description}
+\item Blaker, H. (2000). ``Confidence curves and improved exact confidence intervals for discrete distributions''
+{\it Canadian Journal of Statistics} {\bf 28,} 783-798 (correction {\bf 29,} 681).
+\item Fay, M.P. (2010). ``Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data'' (unpublished paper, 
+see doc directory of exactci package).
+\item Hirji, K.F. (2006). {\it Exact Analysis of Discrete Data}. Chapman and Hall/CRC: New York.
+\end{description}
+
+\end{document}
+
+See also the 'exact2x2' package for exact conditional tests with matching confidence intervals
+(i.e., Fisher's exact test and Blaker's exact test, see Fay, 2009).
+
+\item Fay, M.P. (2009). ``Confidence Intervals that Match Fisher's Exact or Blaker's Exact Tests'' (to appear Biostatistics. 
+See Fay2009MatchingCI.pdf in doc 
+directory of the exact2x2 package for earlier version which is essentially the paper plus the supplement).
