@@ -1,5 +1,6 @@
 `exactbinomPvals` <-
-function(x,n,p,relErr=1+10^(-7),method="minlike"){
+function(x,n,p,relErr=1+10^(-7),tsmethod="minlike"){
+
     np<-length(p)
     if (any(p>1) | any(p<0)) stop("p must be in [0,1]")
     #fisher<-blaker<-central<-rep(NA,nor)
@@ -7,7 +8,7 @@ function(x,n,p,relErr=1+10^(-7),method="minlike"){
     support<- 0:n
     X<- support==x
     ns<-length(support)
-    if (method=="blaker"){
+    if (tsmethod=="blaker"){
         for (i in 1:np){
             f<-dbinom(support,n,p[i])
             d<-f[X]
@@ -25,13 +26,13 @@ function(x,n,p,relErr=1+10^(-7),method="minlike"){
                 } else pvals[i]<-upper
             } 
         }
-    } else if (method=="minlike"){
+    } else if (tsmethod=="minlike"){
         for (i in 1:np){
             f<-dbinom(support,n,p[i])
             d<-f[X]
             pvals[i]<-sum(f[f<=d*relErr])
         }   
-    } else if (method=="central"){
+    } else if (tsmethod=="central"){
         Xlo<-support<=x
         Xhi<-support>=x
         for (i in 1:np){

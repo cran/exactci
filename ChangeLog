@@ -1,1 +1,12 @@
+
+
+1.1-0
+- fix citation file
+- fix bug in exactbinomCI function when method="blaker", lower interval not correct
+- add plot option for binom.exact and poisson.exact
+- add exactbinomPlot and exactpoissonPlot functions 
+- change method parameter to tsmethod parameter in all functions for simplicity, 
+   previously it was method in the internal functions and tsmethod in the called functions
+
+
 1.0-0 First public release

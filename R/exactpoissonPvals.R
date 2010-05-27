@@ -1,7 +1,7 @@
-exactpoissonPval<-function(x,T=1,r=1,relErr=1+1e-07,method="central"){
+exactpoissonPval<-function(x,T=1,r=1,relErr=1+1e-07,tsmethod="central"){
     if (length(r)>1 | length(x)>1 | length(T)>1) stop("x,T, and r should be of length 1")
     m<-r*T  
-    if (method=="minlike"){
+    if (tsmethod=="minlike"){
             ## copied from poisson.test
             if (m == 0) 
                 PVAL<-(x == 0)
@@ -22,10 +22,10 @@ exactpoissonPval<-function(x,T=1,r=1,relErr=1+1e-07,method="central"){
                   PVAL<-ppois(y - 1, m) + ppois(x - 1, m, lower.tail = FALSE)
                 }
             }
-    } else if (method=="central"){
+    } else if (tsmethod=="central"){
         PVAL<-min(1, 2*min(ppois(x, m), ppois(x - 
             1, m, lower.tail = FALSE)))
-    } else if (method=="blaker"){
+    } else if (tsmethod=="blaker"){
         lower.tail<-ppois(x,m)
         upper.tail<-ppois(x-1,m,lower.tail=FALSE)
         if (lower.tail>=upper.tail){
@@ -48,11 +48,11 @@ exactpoissonPval<-function(x,T=1,r=1,relErr=1+1e-07,method="central"){
     PVAL
 }
 
-exactpoissonPvals<-function(x,T=1,r=1,relErr=1+1e-07,method="central"){
+exactpoissonPvals<-function(x,T=1,r=1,relErr=1+1e-07,tsmethod="central"){
     nr<-length(r)
     p<-rep(NA,nr)
     for (i in 1:nr){
-        p[i]<-exactpoissonPval(x,T=T,r=r[i],relErr=relErr,method=method)
+        p[i]<-exactpoissonPval(x,T=T,r=r[i],relErr=relErr,tsmethod=tsmethod)
     }
     list(r=r,T=T,pvals=p)
 }

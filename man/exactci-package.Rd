@@ -41,8 +41,8 @@ Maintainer: Mike Fay <mfay@niaid.nih.gov>
 Blaker, H. (2000) Confidence curves and improved exact confidence intervals for discrete distributions.
 Canadian Journal of Statistics 28: 783-798.
 
-Fay, M. P. (2009). Confidence intervals that Match Fisher's exact and Blaker's exact tests.
-  (to appear Biostatistics).
+Fay, M. P. (2010). Confidence intervals that Match Fisher's exact and Blaker's exact tests.
+  Biostatistics. 11:373-374.
 
 Hirjim K. F. (2006). Exact analysis of discrete data. Chapman and Hall/CRC. New York.
 }

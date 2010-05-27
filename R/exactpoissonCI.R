@@ -1,4 +1,4 @@
-exactpoissonCI<-function(x, method="minlike",conf.level=.95,tol=.00001,
+exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
     pRange=c(1e-10,1-1e-10)){
 
     ## code is a modification of exact2x2CI
@@ -18,7 +18,7 @@ exactpoissonCI<-function(x, method="minlike",conf.level=.95,tol=.00001,
 
     ## the intercept function finds the places where there is a jump 
     ## in the evidence (i.e., p-value) function
-    intercept<-function(xlo,xhi,TSmethod=method){
+    intercept<-function(xlo,xhi,TSmethod=tsmethod){
         if (TSmethod=="minlike"){
             ## root is the parameter  
             ## where dpois(xlo,root)=dpois(xhi,root)
@@ -169,7 +169,7 @@ exactpoissonCI<-function(x, method="minlike",conf.level=.95,tol=.00001,
             if (i==1){
                 if (Fbar>alpha){
                     rootfunc<-function(p){
-                        alpha - exactpoissonPvals(x,p,method=method)$pvals
+                        alpha - exactpoissonPvals(x,p,tsmethod=tsmethod)$pvals
                      }
 
                     if (rootfunc(rRange[1])<0) stop("very small rate, modify pRange")
@@ -200,5 +200,5 @@ exactpoissonCI<-function(x, method="minlike",conf.level=.95,tol=.00001,
     CINT
 }
 
-#exactpoissonCI(5,method="minlike")
-#exactpoissonCI(5,method="blaker")
+#exactpoissonCI(5,tsmethod="minlike")
+#exactpoissonCI(5,tsmethod="blaker")

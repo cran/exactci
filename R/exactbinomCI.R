@@ -1,4 +1,4 @@
-exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
+exactbinomCI<-function(x, n, tsmethod="minlike",conf.level=.95,tol=.00001,
     pRange=c(1e-10,1-1e-10)){
 
     ## code is a modification of exact2x2CI
@@ -27,7 +27,7 @@ exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
     ## the intercept function finds the places where there is a jump 
     ## in the evidence (i.e., p-value) function
 
-    intercept<-function(xlo,xhi,TSmethod=method){
+    intercept<-function(xlo,xhi,TSmethod=tsmethod){
         if (TSmethod=="minlike"){
             ## root is the parameter  
             ## where dbinom(xlo,n,root)=dbinom(xhi,n,root)
@@ -152,7 +152,7 @@ exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
                         out<-rep(NA,np)
                         for (i in 1:np){
                             #out[i]<- alpha - pbinom(x,n,p[i],lower.tail=TRUE)
-                            out[i]<-alpha - exactbinomPvals(x,n,p[i],method=method)$pvals
+                            out[i]<-alpha - exactbinomPvals(x,n,p[i],tsmethod=tsmethod)$pvals
                         }
                         out
                     }
@@ -184,7 +184,9 @@ exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
         ints<-rep(NA,nless)
         for (i in 1:nless){
             ints[i]<-intercept(xless[i],x)
-            Fbar<-pbinom(x,n,ints[i],lower.tail=FALSE)
+            ### fixed below mistake may 6, 2010
+            #Fbar<-pbinom(x,n,ints[i],lower.tail=FALSE)
+            Fbar<-pbinom(x-1,n,ints[i],lower.tail=FALSE)
             if (i==1){
                 if (Fbar>alpha){
                     rootfunc<-function(p){
@@ -192,7 +194,7 @@ exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
                         out<-rep(NA,np)
                         for (i in 1:np){
                             #out[i]<- alpha - pbinom(x,n,p[i],lower.tail=FALSE)
-                            out[i]<- alpha - exactbinomPvals(x,n,p[i],method=method)$pvals
+                            out[i]<- alpha - exactbinomPvals(x,n,p[i],tsmethod=tsmethod)$pvals
                          }
                         out
                     }
@@ -225,10 +227,10 @@ exactbinomCI<-function(x, n, method="minlike",conf.level=.95,tol=.00001,
 }
 
 #p<-(1:1000)/1001
-#pval<-exactbinomPvals(3,10,p,method="blaker")
+#pval<-exactbinomPvals(3,10,p,tsmethod="blaker")
 #plot(p,pval$pvals,xlim=c(.61,.64),ylim=c(.04,.06))
 #lines(c(0,1),c(.05,.05))
 #lines(c(.0873,.0873),c(0,1))
 #lines(c(.6066,.6066),c(0,1))
-#exactbinomCI(3,10,method="blaker")
-exactbinomCI(18,99,method="minlike")
+#exactbinomCI(3,10,tsmethod="blaker")
+#exactbinomCI(18,99,tsmethod="minlike")

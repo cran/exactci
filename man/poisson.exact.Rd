@@ -11,7 +11,7 @@
 \usage{
 poisson.exact(x, T = 1, r = 1,
     alternative = c("two.sided", "less", "greater"), tsmethod=c("central","minlike","blaker"),
-    conf.level = 0.95, control=binomControl())
+    conf.level = 0.95, control=binomControl(), plot=FALSE)
 }
 \arguments{
   \item{x}{number of events. A vector of length one or two.}
@@ -25,6 +25,7 @@ poisson.exact(x, T = 1, r = 1,
     interval.}
   \item{control}{list with settings to avoid problems with ties, etc, should not need to change this for normal use, 
    see \code{\link{binomControl}} }
+  \item{plot}{logical, plot p-value function? For finer control on plot see \code{\link{exactpoissonPlot}}}
 }
 \details{
   Confidence intervals are computed similarly to those of
@@ -62,7 +63,7 @@ Lehmann, EL, and Romano, JP (2005). Testing Statistical Hypotheses, third editio
   size). This is the role of the \code{T} argument.
 }
 \seealso{
-  \code{\link{binom.test}}
+  \code{\link{poisson.test}},  \code{\link{exactpoissonPlot}}, 
 }
 \examples{
 ### Suppose you have observed rates of  2 out of 17877 in group A 

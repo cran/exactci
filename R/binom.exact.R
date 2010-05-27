@@ -1,6 +1,6 @@
 binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less", 
     "greater"), tsmethod=c("central","minlike","blaker"), conf.level = 0.95, 
-    control=binomControl()) 
+    control=binomControl(),plot=FALSE) 
 {
     relErr<-control$relErr
     tol<-control$tol
@@ -37,7 +37,7 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
     if (tsmethod!="central" & tsmethod!="minlike" & tsmethod!="blaker") stop("tsmethod must be one of 'central', 'minlike', or 'blaker' ")
 
     PVAL <- switch(alternative, less = pbinom(x, n, p), greater = pbinom(x-1,n,p,lower.tail=FALSE), 
-        two.sided = exactbinomPvals(x,n,p,relErr=relErr,method=tsmethod)$pvals)
+        two.sided = exactbinomPvals(x,n,p,relErr=relErr,tsmethod=tsmethod)$pvals)
 
     p.L <- function(x, alpha) {
         if (x == 0) 
@@ -58,7 +58,7 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
             alpha <- (1 - conf.level)/2
             CINT<-c(p.L(x, alpha), p.U(x, alpha))
         } else {
-            CINT<-exactbinomCI(x,n,method=tsmethod,conf.level=conf.level,
+            CINT<-exactbinomCI(x,n,tsmethod=tsmethod,conf.level=conf.level,
                 tol=tol,pRange=pRange)
         }
     }
@@ -75,9 +75,15 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
            minlike="Exact two-sided binomial test (sum of minimum likelihood method)",
            central="Exact two-sided binomial test (central method)",
            blaker="Exact two-sided binomial test (Blaker's method)")
-           
+      
+    if (plot){
+        exactbinomPlot(x,n,alternative=alternative,tsmethod=tsmethod,conf.level=conf.level,pch=16,cex=.5,col="gray")
+        points(p,PVAL,col="black")
+    }     
     structure(list(statistic = x, parameter = n, p.value = PVAL, 
         conf.int = CINT, estimate = ESTIMATE, null.value = p, 
         alternative = alternative, method = methodphrase, 
         data.name = DNAME), class = "htest")
 }
+
+#binom.exact(4,20,.05,tsmethod="blaker",plot=TRUE)

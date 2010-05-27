@@ -12,7 +12,7 @@ binom.exact(x, n, p = 0.5,
    alternative = c("two.sided", "less", "greater"), 
    tsmethod = c("central", "minlike", "blaker"), 
    conf.level = 0.95, 
-   control=binomControl())
+   control=binomControl(),plot=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -39,8 +39,11 @@ indicates the method for a two-sided alternative hypothesis
   \item{conf.level}{
 confidence level for the returned confidence interval.
 }
-  \item{control}{list with settings to avoid problems with ties, etc, should not need to change this for normal use, 
+  \item{control}{
+list with settings to avoid problems with ties, etc, should not need to change this for normal use, 
    see \code{\link{binomControl}} 
+}
+\item{plot}{logical, do basic plot of p-value function by null hypothesis value, see \code{\link{exactbinomPlot}} for more plot options
 }
 }
 \details{
@@ -63,7 +66,7 @@ Once the p-value function is defined we can invert the test to create 'matching'
 confidence intervals defined as the smallest interval that contains all parameter values for which the two-sided
 hypothesis test does not reject. There are some calculation issues for the 
 'minlike' and 'blaker' methods which are the same as for exact tests 
-for 2x2 tables (see Fay, 2009).
+for 2x2 tables (see Fay, 2010).
 }
 \value{
 An object of class 'htest': a list with items
@@ -81,8 +84,8 @@ An object of class 'htest': a list with items
 Blaker, H. (2000) Confidence curves and improved exact confidence intervals for discrete distributions.
 Canadian Journal of Statistics 28: 783-798.
 
-Fay, M. P. (2009). Confidence intervals that Match Fisher's exact and Blaker's exact tests.
-  (to appear Biostatistics).
+Fay, M. P. (2010). Confidence intervals that Match Fisher's exact and Blaker's exact tests.
+  Biostatistics. 11:373-374.
 
 Hirjim K. F. (2006). Exact analysis of discrete data. Chapman and Hall/CRC. New York.
 

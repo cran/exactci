@@ -1,6 +1,6 @@
 poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less", 
     "greater"),  tsmethod=c("central","minlike","blaker"), conf.level = 0.95,
-    control=binomControl()) 
+    control=binomControl(), plot=FALSE) 
 {
     ## these values should not need to be changed for most uses of the function
     relErr<-control$relErr
@@ -55,13 +55,12 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 central="Exact two-sided Poisson test (central method)",
                 blaker="Exact two-sided Poisson test (Blaker's method)")
         RVAL$method <- methodphrase
-        return(RVAL)
     }
     else {
         m <- r * T
         PVAL <- switch(alternative, less = ppois(x, m), greater = ppois(x - 
             1, m, lower.tail = FALSE), 
-            two.sided = exactpoissonPval(x,T,r,relErr, method=tsmethod))
+            two.sided = exactpoissonPval(x,T,r,relErr, tsmethod=tsmethod))
 
         p.L <- function(x, alpha) {
             if (x == 0) 
@@ -79,7 +78,7 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 alpha <- (1 - conf.level)/2 
                 CINT<-c(p.L(x, alpha), p.U(x, alpha))
             } else {
-                CINT<-exactpoissonCI(x,method=tsmethod,conf.level=conf.level)
+                CINT<-exactpoissonCI(x,tsmethod=tsmethod,conf.level=conf.level)
             }
         }
         CINT<-CINT/T
@@ -97,10 +96,19 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 blaker="Exact two-sided Poisson test (Blaker's method)")
 
 
-        structure(list(statistic = x, parameter = T, p.value = PVAL, 
+        RVAL<-structure(list(statistic = x, parameter = T, p.value = PVAL, 
             conf.int = CINT, estimate = ESTIMATE, null.value = r, 
             alternative = alternative, method = methodphrase, 
             data.name = DNAME), class = "htest")
     }
+
+    if (plot){
+        ## use all defaults for plot
+        lowerRange<-ifelse(RVAL$conf.int[1]==0, .8*min(r,RVAL$conf.int[2]), .8*min(RVAL$conf.int[1],r) )
+        upperRange<-ifelse(RVAL$conf.int[2]==Inf, 1.2*max(r,RVAL$conf.int[1]), 1.2*max(RVAL$conf.int[2],r) )
+        exactpoissonPlot(x,T,tsmethod=tsmethod,rRange=c(lowerRange,upperRange),alternative=alternative,conf.level=conf.level,col="gray")
+        points(r,RVAL$p.value,col="black")
+    }
+    return(RVAL)
 }
 #poisson.exact(c(5,4),c(132412,311312))
