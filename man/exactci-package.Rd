@@ -44,6 +44,8 @@ Canadian Journal of Statistics 28: 783-798.
 Fay, M. P. (2010). Confidence intervals that Match Fisher's exact and Blaker's exact tests.
   Biostatistics. 11:373-374.
 
+Fay, M.P. (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data. R Journal 2(1): 53-58.
+
 Hirjim K. F. (2006). Exact analysis of discrete data. Chapman and Hall/CRC. New York.
 }
 \keyword{ package }

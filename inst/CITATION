@@ -3,12 +3,12 @@ citHeader("To cite exactci in publications use:")
 citEntry(entry="Article",
   title        = "Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data",
   author       = personList(as.person("Michael P. Fay")), 
-  journal      = "unpublished manuscript, submitted to R Journal",
+  journal      = "R Journal",
   year         = "2010",
-  volume       = "",
-  number       = "",  
-  pages        = "",
+  volume       = "2",
+  number       = "1",  
+  pages        = "53--58",
   url ="http://journal.r-project.org/",
-  textVersion  ="Fay MP (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data. (unpublished manuscript, submitted to R Journal)",
+  textVersion  ="Fay MP (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data.  R Journal 2(1):53-58.",
   header = ""
 )

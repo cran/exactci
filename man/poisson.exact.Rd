@@ -53,6 +53,8 @@ of the three different two-sided methods for calculating p-values and confidence
   \item{data.name}{a character string giving the names of the data.}
 }
 \references{
+Fay, M.P. (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data. R Journal 2(1): 53-58.
+
 Garwood, F (1936). Fiducial limits for the Poisson distribution. Biometrika, 437-442.
 
 Lehmann, EL, and Romano, JP (2005). Testing Statistical Hypotheses, third edition. Springer:New York.
