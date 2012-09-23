@@ -1,3 +1,8 @@
+1.2-0
+ - fix bug for poisson.exact  when x=0 and tsmethod="blaker", previously it would hang, now gives correct value (see code of exactpoissonPval exactpoissonCI for change). Thanks to Paul Schuette for pointing out this bug. 
+- fix attribute for confidence interval precision for poisson tests using tsmethod="blaker" or "minlike" (I had previously forgot to transform the results that came from the binom.exact)
+- delete pdf from /inst/doc/ of R Journal paper, since it is now published and available at        http://journal.r-project.org/archive/2010-1/RJournal_2010-1_Fay.pdf
+
 1.1-0.1
 - update citation
 

@@ -72,8 +72,8 @@ Similar examples apply to exact binomial tests. For details see Fay (2010).
 \begin{description}
 \item Blaker, H. (2000). ``Confidence curves and improved exact confidence intervals for discrete distributions''
 {\it Canadian Journal of Statistics} {\bf 28,} 783-798 (correction {\bf 29,} 681).
-\item Fay, M.P. (2010). ``Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data'' (unpublished paper, 
-see doc directory of exactci package).
+\item Fay, M.P. (2010). ``Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data'' . R Journal 2(1): 53-58
+(available at  \verb@http://journal.r-project.org/archive/2010-1/RJournal_2010-1_Fay.pdf@). 
 \item Hirji, K.F. (2006). {\it Exact Analysis of Discrete Data}. Chapman and Hall/CRC: New York.
 \end{description}
 

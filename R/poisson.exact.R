@@ -46,6 +46,15 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
         names(RVAL$estimate) <- "rate ratio"
         pp <- RVAL$conf.int
         RVAL$conf.int <- pp/(1 - pp) * T[2]/T[1]
+        ## Sept 22, 2012, forgot to transform precision also
+        if (tsmethod=="blaker" | tsmethod=="minlike"){
+            pplowerprec<- attr(RVAL$conf.int,"conf.limit.prec")$lower
+            rval.lower.prec<-pplowerprec/(1-pplowerprec)*T[2]/T[1]
+            ppupperprec<- attr(RVAL$conf.int,"conf.limit.prec")$upper
+            rval.upper.prec<-ppupperprec/(1-ppupperprec)*T[2]/T[1]
+            attr(RVAL$conf.int,"conf.limit.prec")<-list(lower=rval.lower.prec,
+                upper=rval.upper.prec)
+        }
         names(r) <- "rate ratio"
         RVAL$null.value <- r
         methodphrase<-"Exact one-sided Comparison of Poisson rates"

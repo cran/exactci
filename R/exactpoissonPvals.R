@@ -37,7 +37,10 @@ exactpoissonPval<-function(x,T=1,r=1,relErr=1+1e-07,tsmethod="central"){
         } else {
             ## find a new upper.tail that is as large as possible without being
             ## larger than lower.tail
-            N<-2*x           
+            ## Sept 21, 2012: fix for x=0 case, before multiplied by 2 and hung
+            ## Now start at N=1
+            if (x==0){ N<-1
+            } else N<-2*x           
             while (ppois(N,m,lower.tail=FALSE)>lower.tail) N<-2*N
             y<-(x-1):N
             UPPER.TAIL<-ppois(y,m,lower.tail=FALSE)

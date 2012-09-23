@@ -134,7 +134,10 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
         ## the 1-alpha/100 upper confidence limit,  
         ## the tail is much less than alpha, say alpha/100
         ## this is arbitrary, there is probably room for improvement
-        n<- qpois(1-alpha/100,qgamma(1-alpha/100,x))   
+        ## Sept 21,2012: fixed error, gives n=0 if x=0
+        if (x==0){ gammaParm<- 1
+        } else gammaParm<-x
+        n<- qpois(1-alpha/100,qgamma(1-alpha/100,gammaParm))   
         xgreater<-n:(x+1)
         ngreater<- length(xgreater)
         ints<-rep(NA,ngreater)
@@ -201,4 +204,4 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
 }
 
 #exactpoissonCI(5,tsmethod="minlike")
-#exactpoissonCI(5,tsmethod="blaker")
+#exactpoissonCI(0,tsmethod="blaker")
