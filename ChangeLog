@@ -1,3 +1,7 @@
+1.2-1
+- move vignette to the vignettes directory
+
+
 1.2-0
  - fix bug for poisson.exact  when x=0 and tsmethod="blaker", previously it would hang, now gives correct value (see code of exactpoissonPval exactpoissonCI for change). Thanks to Paul Schuette for pointing out this bug. 
 - fix attribute for confidence interval precision for poisson tests using tsmethod="blaker" or "minlike" (I had previously forgot to transform the results that came from the binom.exact)

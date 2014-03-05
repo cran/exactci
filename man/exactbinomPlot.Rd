@@ -9,9 +9,12 @@ For two-sided p-values, can plot three types of p-values: the minimum likelihood
 method (i.e., twice the one-sided exact p-values), and Blaker's exact.
 }
 \usage{
-exactbinomPlot(x, n, p = NULL, ndiv = 1000, tsmethod = "central", pRange = c(0, 1), 
-   dolines = FALSE, dopoints = TRUE, doci=TRUE, alternative=c("two.sided","less","greater"),
-   relErr=1+10^(-7), conf.level=.95, alphaline=TRUE, newplot = TRUE, ...)
+exactbinomPlot(x, n, p = NULL, ndiv = 1000, 
+    tsmethod = "central", pRange = c(0, 1), 
+    dolines = FALSE, dopoints = TRUE, doci=TRUE, 
+    alternative=c("two.sided","less","greater"),
+    relErr=1+10^(-7), conf.level=.95, alphaline=TRUE, 
+    newplot = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

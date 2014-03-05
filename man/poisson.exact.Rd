@@ -10,7 +10,8 @@
 }
 \usage{
 poisson.exact(x, T = 1, r = 1,
-    alternative = c("two.sided", "less", "greater"), tsmethod=c("central","minlike","blaker"),
+    alternative = c("two.sided", "less", "greater"), 
+    tsmethod=c("central","minlike","blaker"),
     conf.level = 0.95, control=binomControl(), plot=FALSE)
 }
 \arguments{

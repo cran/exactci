@@ -1,5 +1,5 @@
-efbf03dddf4effe24bf08d63c5f8e7df *ChangeLog
-471f489c717d18bb4942e2768684d66b *DESCRIPTION
+bb83d6572188abcc43e0fe90e03dc162 *ChangeLog
+f4241a530d00dee6efdf802b0716a3b3 *DESCRIPTION
 9c0c1c2b610cb9ebcf24b525edd18e46 *NAMESPACE
 4b3f325684e06980ac296d550d1d2cf8 *R/binom.exact.R
 d3743eb044bebc109bcd5df0812352b7 *R/binomControl.R
@@ -10,13 +10,16 @@ cc9c275378d291a0f483746732d6a690 *R/exactbinomPlot.R
 3210c239c4d1106f5fb1f610622b6e65 *R/exactpoissonPlot.R
 42d1d5fa7c6a9c3c2ddac833cec53c2b *R/exactpoissonPvals.R
 d2963894747c3d18e0ae810f697b0781 *R/poisson.exact.R
+9d2363a0f6bc2ef5ae96d44278cb65a3 *build/vignette.rds
 94e3fea0633bc98622a55234d5832bc8 *inst/CITATION
+1f15b9b91294820fd5899a752b2754e4 *inst/doc/exactci.R
 91c10b32e4fb6e13ad624ae5c52d3703 *inst/doc/exactci.Rnw
-aa79a40b9131ebd49efee2b92d2aabec *inst/doc/exactci.pdf
+0d0105956b3a73f780d1a16579b84990 *inst/doc/exactci.pdf
 9a7290712d6c579a41bf661ed704685c *man/binom.exact.Rd
 b282b7e1913d8f76e03a17af168a875a *man/binomControl.Rd
-38923d5bedffaedb8e9e0de0e760c2d0 *man/exactbinomPlot.Rd
+8ac15b07d088c7e39d94ddc97294f142 *man/exactbinomPlot.Rd
 5e73820069ad4d3be0e7c499665d497a *man/exactci-internal.Rd
 f5095ba5f2e7035faa0c839501a8a8df *man/exactci-package.Rd
 ddad74693ea45d36b8142232b598e624 *man/exactpoissonPlot.Rd
-e558dc93bfcf227e8c60d5cabd754ac4 *man/poisson.exact.Rd
+e002498ee02a763fbd6176135f634009 *man/poisson.exact.Rd
+91c10b32e4fb6e13ad624ae5c52d3703 *vignettes/exactci.Rnw
