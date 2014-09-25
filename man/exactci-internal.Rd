@@ -12,7 +12,7 @@ Internal functions, not to be called directly
 \description{These functions give p-values for exact binomial or poisson test. Not to be called directly, use \code{\link{binom.exact}} or 
 \code{\link{poisson.exact}}}
 \usage{
-exactbinomPvals(x, n, p, relErr = 1 + 10^(-7), tsmethod = "minlike")
+exactbinomPvals(x, n, p, relErr = 1 + 10^(-7), tsmethod = "minlike",midp=FALSE)
 exactpoissonPval(x,T=1,r=1,relErr=1+1e-07,tsmethod="central")
 exactpoissonPvals(x,T=1,r=1,relErr=1+1e-07,tsmethod="central")
 exactbinomCI(x, n, tsmethod="minlike",conf.level=.95,tol=.00001,
@@ -31,6 +31,7 @@ exactpoissonCI(x, tsmethod="minlike",conf.level=.95,tol=.00001,
  \item{conf.level}{number between 0 and 1 for level of confidence interval}
  \item{pRange}{range to search for confidence intervals, between 0 and 1 (even for poisson where it is transformed to a 0 to Inf-like range)}
  \item{tol}{tolerance for precision of confidence interval, very small number}
+\item{midp}{logical, use mid-p for p-values?}
 }
 \details{
 The function \code{exactbinomPvals} tests point null hypotheses for a single binomial observation.

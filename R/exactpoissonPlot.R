@@ -12,7 +12,8 @@ exactpoissonPlot<-function(x,
     relErr=1 + 10^(-7), 
     conf.level=.95,
     alphaline=TRUE,
-    newplot=TRUE,...){
+    newplot=TRUE,
+    midp=FALSE,...){
 
     ## copied setup code from poisson.test, Version 2.10.1
     ## copy much of this from poisson.test 
@@ -42,7 +43,7 @@ exactpoissonPlot<-function(x,
         xtemp<-ifelse(x==0,1,x)
         ci<-poisson.exact(x=xtemp,T=T,r=1,
             tsmethod="central",alternative = "two.sided", 
-            conf.level=.95)$conf.int
+            conf.level=.95,midp=midp)$conf.int
         rRange<-c(ci[1]*.8,ci[2]*1.2)
     }
     if (dolog & is.null(r)){
@@ -59,16 +60,32 @@ exactpoissonPlot<-function(x,
     if (k == 2) {
         p<- r* T[1]/(r * T[1] + T[2])
         n<-sum(x)
+        midp.adjustment<- 0 
+        if (midp) midp.adjustment<- 0.5*dbinom(x[1],n,p)
+        if (midp & alternative=="two.sided" & tsmethod!="central") 
+            stop("mid-p method for two-sided tests must have tsmethod='central'")
         pval<-switch(alternative,
-            less=pbinom(x[1],n,p),
-            greater=pbinom(x[1]-1,n,p,lower.tail=FALSE),
-            two.sided=exactbinomPvals(x[1],n,p,tsmethod=tsmethod,relErr=relErr)$pvals)
+            less=pbinom(x[1],n,p) - midp.adjustment,
+            greater=pbinom(x[1]-1,n,p,lower.tail=FALSE) - midp.adjustment,
+            two.sided=exactbinomPvals(x[1],n,p,tsmethod=tsmethod,relErr=relErr,midp=midp)$pvals)
     }
     else {
         m <- r * T
-        pval <- switch(alternative, less = ppois(x, m), greater = ppois(x - 
-            1, m, lower.tail = FALSE), 
-            two.sided = exactpoissonPvals(x,T,r,relErr, tsmethod=tsmethod)$pvals)
+        if (midp){
+             if (alternative=="two.sided" & tsmethod!="central") 
+                stop("mid-p method for two-sided tests must have tsmethod='central'")
+            midp.less<-ppois(x, m)-0.5*dpois(x,m)
+            midp.greater<-ppois(x - 1, m, lower.tail = FALSE)-0.5*dpois(x,m)
+            pval <- switch(alternative, 
+                less = midp.less, 
+                greater = midp.greater, 
+                two.sided = pmin(rep(1,length(midp.less)),2*midp.less,2*midp.greater))
+        } else {
+            pval <- switch(alternative, 
+                less = ppois(x, m), 
+                greater = ppois(x - 1, m, lower.tail = FALSE), 
+                two.sided = exactpoissonPvals(x,T,r,relErr, tsmethod=tsmethod)$pvals)
+        }
     }
         
     if (newplot){
@@ -79,7 +96,9 @@ exactpoissonPlot<-function(x,
         }
         if (dolog){ LOG<-"x"
         } else LOG<-""
-        plot(r,pval,xlab=XLAB,ylab="p-value",type="n",log=LOG,...)
+        YLAB<-"p-value"
+        if (midp) YLAB<-"mid p-value"
+        plot(r,pval,xlab=XLAB,ylab=YLAB,type="n",log=LOG,...)
     } 
     if (dopoints){
         points(r,pval,...)
@@ -90,7 +109,7 @@ exactpoissonPlot<-function(x,
     if (doci){
         ci<-poisson.exact(x,T,tsmethod=tsmethod,alternative=alternative,
             control=binomControl(relErr=relErr),
-            conf.level=conf.level)$conf.int
+            conf.level=conf.level,midp=midp)$conf.int
         alpha<-1-conf.level
         if (alphaline) lines(range(r),c(alpha,alpha),lty=2)
         lines(c(ci[1],ci[1]),c(0,alpha),...)

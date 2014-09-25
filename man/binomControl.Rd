@@ -6,7 +6,10 @@ This function produces a list of tuning parameters used in the calculations done
 and \code{\link{poisson.exact}}. These will not need to be changed by most ordinary users.
 }
 \usage{
-binomControl(relErr=1+1e-07,tol=.00001,pRange=c(1e-10,1-1e-10))
+binomControl(relErr=1+1e-07,tol=.00001,
+    pRange=c(1e-10,1-1e-10),
+    minn=1, maxn=10^4, 
+    PRINT.STEPS=FALSE)
 }
 \arguments{
   \item{relErr}{
@@ -17,6 +20,15 @@ value very close to 0, used in calculation of two-sided confidence intervals
 }
   \item{pRange}{
 range close to [0,1], but excluding the endpoints, used in calculation of two-sided confidence intervals
+}
+\item{minn}{
+minimum n used by powerBinom. The search for the lowest n that gives power is crude and goes from minn to maxn by ones.
+}
+\item{maxn}{
+maximum n used by powerBinom
+}
+\item{PRINT.STEPS}{
+logical, print steps of uniroot.integer used to find the n when type='cilength' in powerBinom?
 }
 }
 \details{

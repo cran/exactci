@@ -12,7 +12,7 @@ binom.exact(x, n, p = 0.5,
    alternative = c("two.sided", "less", "greater"), 
    tsmethod = c("central", "minlike", "blaker"), 
    conf.level = 0.95, 
-   control=binomControl(),plot=FALSE)
+   control=binomControl(),plot=FALSE, midp=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -45,6 +45,7 @@ list with settings to avoid problems with ties, etc, should not need to change t
 }
 \item{plot}{logical, do basic plot of p-value function by null hypothesis value, see \code{\link{exactbinomPlot}} for more plot options
 }
+\item{midp}{logical, use mid-p for p-values and confidence intervals? midp Confidence intervals are not available for tsmethod='minlike' and 'blaker'} 
 }
 \details{
 Traditionally, hypothesis tests and confidence intervals are treated separately.
@@ -67,6 +68,13 @@ confidence intervals defined as the smallest interval that contains all paramete
 hypothesis test does not reject. There are some calculation issues for the 
 'minlike' and 'blaker' methods which are the same as for exact tests 
 for 2x2 tables (see Fay, 2010).
+
+
+All of the above traditional p-values can be thought of as estimating Pr[X=xobs or X is more extreme than xobs] under the null hypothesis, where more extreme is defined differently for different methods. The mid-p-value replaces this with 0.5*Pr[X=xobs]+ Pr[X is more extreme than xobs]. The mid-p p-values are not valid. In other words, for all parameter values under the null hypothesis we are not guaranteed to bound the type I error rate. However, the usual exact methods that guarantee the type I error rate are typically conservative for most parameter values in order to bound the type I error rate for all parameter values. So if you are interested in rejecting approximately on average about 5 percent of the time for arbitrary parameter values and n values under the null hypothesis, then use midp=TRUE. If you want to ensure bounding of the type I errror rate for all n and all parameter values use midp=FALSE. (See for example, Vollset, 1993, or Hirji, 2006). 
+
+The associated midp confidence intervals have not been programmed for tsmethod='blaker' and 'minlike'. 
+
+
 }
 \value{
 An object of class 'htest': a list with items
@@ -89,10 +97,12 @@ Fay, M. P. (2010). Confidence intervals that Match Fisher's exact and Blaker's e
 
 Fay, M.P. (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data. R Journal 2(1): 53-58.
 
-Hirjim K. F. (2006). Exact analysis of discrete data. Chapman and Hall/CRC. New York.
+Hirji K. F. (2006). Exact analysis of discrete data. Chapman and Hall/CRC. New York.
 
 Stern, T (1954). Some remarks on confidence and fiducial limits.
 Biometrika, 275-278.
+
+Vollset, S. E. (1993). Confidence intervals for a binomial proportion. Statistics in medicine, 12(9), 809-824.
 
 Vos, P.W. and Hudson, S. (2008). Problems with binomial two-sided tests and the associated
 confidence interals. Aust. N.Z. J. Stat. 50: 81-89.
@@ -130,7 +140,7 @@ binom.test(10,12,p=20000/37877)
 binom.exact(10,12,p=20000/37877,tsmethod="minlike")
 binom.exact(10,12,p=20000/37877,tsmethod="central")
 binom.exact(10,12,p=20000/37877,tsmethod="blaker")
-## two-sided methods are also available
+## one-sided methods are also available
 ## as in binom.test
 
 }

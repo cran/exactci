@@ -1,6 +1,8 @@
-binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less", 
-    "greater"), tsmethod=c("central","minlike","blaker"), conf.level = 0.95, 
-    control=binomControl(),plot=FALSE) 
+binom.exact<-function (x, n, p = 0.5, 
+    alternative = c("two.sided", "less", "greater"), 
+    tsmethod=c("central","minlike","blaker"), 
+    conf.level = 0.95, control=binomControl(),plot=FALSE,
+    midp=FALSE) 
 {
     relErr<-control$relErr
     tol<-control$tol
@@ -36,18 +38,66 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
     tsmethod<-match.arg(tsmethod)
     if (tsmethod!="central" & tsmethod!="minlike" & tsmethod!="blaker") stop("tsmethod must be one of 'central', 'minlike', or 'blaker' ")
 
-    PVAL <- switch(alternative, less = pbinom(x, n, p), greater = pbinom(x-1,n,p,lower.tail=FALSE), 
-        two.sided = exactbinomPvals(x,n,p,relErr=relErr,tsmethod=tsmethod)$pvals)
-
-    p.L <- function(x, alpha) {
-        if (x == 0) 
-            0
-        else qbeta(alpha, x, n - x + 1)
+    if (midp){
+        PVAL <- switch(alternative, 
+            less = pbinom(x, n, p)-0.5*dbinom(x,n,p), 
+            greater = pbinom(x-1,n,p,lower.tail=FALSE) - 
+                0.5*dbinom(x,n,p), 
+            two.sided = exactbinomPvals(x,n,p,relErr=relErr,
+                tsmethod=tsmethod, midp=TRUE)$pvals)
+    } else {
+        PVAL <- switch(alternative, 
+            less = pbinom(x, n, p), 
+            greater = pbinom(x-1,n,p,lower.tail=FALSE), 
+            two.sided = exactbinomPvals(x,n,p,relErr=relErr,
+                tsmethod=tsmethod, midp=FALSE)$pvals)
     }
-    p.U <- function(x, alpha) {
-        if (x == n) 
-            1
-        else qbeta(1 - alpha, x + 1, n - x)
+
+    if (midp){
+        # for midp confidence limits, we need 
+        # to use uniroot
+        p.L<-function(x,alpha){
+            if (x==0){
+                out<- 0
+           } else  {
+                rootfunc<-function(p){
+                    # check function without midp correction
+                    # against usual binom.test()$conf.int
+                    #pbinom(x-1,n,p,lower.tail=FALSE) - alpha
+                    # with midp correction
+                    pbinom(x-1,n,p, lower.tail=FALSE)-
+                      0.5*dbinom(x,n,p) - alpha
+               }
+               out<-uniroot(rootfunc,c(0,1))$root
+            }
+            out
+        }
+        p.U<-function(x,alpha){
+            if (x==n){
+                out<-1
+            } else  {
+                rootfunc<-function(p){
+                    # check function without midp correction 
+                    # against usual binom.test()$conf.int
+                    #pbinom(x,n,p) - alpha
+                    # with midp correction
+                    pbinom(x,n,p)-0.5*dbinom(x,n,p) - alpha
+                }
+                out<-uniroot(rootfunc,c(0,1))$root
+            }
+            out
+        }
+    } else {
+        p.L <- function(x, alpha) {
+            if (x == 0) 
+                0
+            else qbeta(alpha, x, n - x + 1)
+        }
+        p.U <- function(x, alpha) {
+            if (x == n) 
+                1
+            else qbeta(1 - alpha, x + 1, n - x)
+        }
     }
     if (alternative=="less"){
         CINT<-c(0, p.U(x, 1 - conf.level))
@@ -58,8 +108,15 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
             alpha <- (1 - conf.level)/2
             CINT<-c(p.L(x, alpha), p.U(x, alpha))
         } else {
-            CINT<-exactbinomCI(x,n,tsmethod=tsmethod,conf.level=conf.level,
-                tol=tol,pRange=pRange)
+            if (midp){
+                #warning("midp confidence intervals not 
+                #available for tsmethod='minlike' or 'blaker' ")
+                CINT<-c(NA,NA)
+            } else {
+                CINT<-exactbinomCI(x,n,tsmethod=tsmethod,
+                   conf.level=conf.level,
+                   tol=tol,pRange=pRange)
+            }
         }
     }
  
@@ -76,8 +133,13 @@ binom.exact<-function (x, n, p = 0.5, alternative = c("two.sided", "less",
            central="Exact two-sided binomial test (central method)",
            blaker="Exact two-sided binomial test (Blaker's method)")
       
+    if (midp){
+        methodphrase<-paste0(methodphrase,", mid-p version")
+    }
     if (plot){
-        exactbinomPlot(x,n,alternative=alternative,tsmethod=tsmethod,conf.level=conf.level,pch=16,cex=.5,col="gray")
+        exactbinomPlot(x,n,alternative=alternative,
+          tsmethod=tsmethod,conf.level=conf.level,
+          pch=16,cex=.5,col="gray",midp=midp)
         points(p,PVAL,col="black")
     }     
     structure(list(statistic = x, parameter = n, p.value = PVAL, 

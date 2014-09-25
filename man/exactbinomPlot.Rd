@@ -14,7 +14,7 @@ exactbinomPlot(x, n, p = NULL, ndiv = 1000,
     dolines = FALSE, dopoints = TRUE, doci=TRUE, 
     alternative=c("two.sided","less","greater"),
     relErr=1+10^(-7), conf.level=.95, alphaline=TRUE, 
-    newplot = TRUE, ...)
+    newplot = TRUE, midp=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,6 +32,7 @@ exactbinomPlot(x, n, p = NULL, ndiv = 1000,
   \item{conf.level}{confidence level for use when doci=TRUE}
 \item{alphaline}{logical, if doci=TRUE should a line be drawn at significance level}
   \item{newplot}{logical,start a new plot?}
+  \item{midp}{logical, use mid-pvalues? See \code{link{binom.exact}} }
   \item{\dots}{values passed to plot, points, or lines statement}
 }
 %\details{}

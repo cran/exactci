@@ -11,7 +11,8 @@ exactbinomPlot<-function(x,
     relErr=1 + 10^(-7), 
     conf.level=.95,
     alphaline=TRUE,
-    newplot=TRUE,...){
+    newplot=TRUE,
+    midp=FALSE,...){
 
     ## copied setup code from binom.test, Version 2.10.1
     xr <- round(x)
@@ -38,13 +39,27 @@ exactbinomPlot<-function(x,
         p<-(minp + (0:ndiv)*(maxp-minp)/ndiv )
     }
     alternative <- match.arg(alternative)
-    pval<-switch(alternative,
-        less=pbinom(x,n,p),
-        greater=pbinom(x-1,n,p,lower.tail=FALSE),
-        two.sided=exactbinomPvals(x,n,p,tsmethod=tsmethod,relErr=relErr)$pvals)
+    if (midp){
+        pval <- switch(alternative, 
+            less = pbinom(x, n, p)-0.5*dbinom(x,n,p), 
+            greater = pbinom(x-1,n,p,lower.tail=FALSE)-
+                0.5*dbinom(x,n,p), 
+            two.sided = exactbinomPvals(x,n,p,relErr=relErr,
+                tsmethod=tsmethod, midp=TRUE)$pvals)
+    } else {
+        pval <- switch(alternative, 
+            less = pbinom(x, n, p), 
+            greater = pbinom(x-1,n,p,lower.tail=FALSE), 
+            two.sided = exactbinomPvals(x,n,p,relErr=relErr,
+                tsmethod=tsmethod, midp=FALSE)$pvals)
+    }
+
 
     if (newplot){
-        plot(p,pval,xlab="Null Hypothesis p",ylab="p-value",type="n",...)
+        YLAB<-"p-value"
+        if (midp) YLAB<-"mid p-value"
+        plot(p,pval,xlab="Null Hypothesis p",ylab=YLAB,
+            type="n",...)
     } 
     if (dopoints){
         points(p,pval,...)
@@ -55,7 +70,7 @@ exactbinomPlot<-function(x,
     if (doci){
         ci<-binom.exact(x,n,tsmethod=tsmethod,alternative=alternative,
             control=binomControl(relErr=relErr),
-            conf.level=conf.level)$conf.int
+            conf.level=conf.level,midp=midp)$conf.int
         alpha<-1-conf.level
         if (alphaline) lines(c(-1,2),c(alpha,alpha),lty=2)
         lines(c(ci[1],ci[1]),c(0,alpha),...)

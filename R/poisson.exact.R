@@ -1,6 +1,6 @@
 poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less", 
     "greater"),  tsmethod=c("central","minlike","blaker"), conf.level = 0.95,
-    control=binomControl(), plot=FALSE) 
+    control=binomControl(), plot=FALSE, midp=FALSE) 
 {
     ## these values should not need to be changed for most uses of the function
     relErr<-control$relErr
@@ -36,7 +36,7 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
     if (k == 2) {
         RVAL <- binom.exact(x, sum(x), r * T[1]/(r * T[1] + T[2]), 
             alternative = alternative, tsmethod=tsmethod, conf.level=conf.level,
-            control=control)
+            control=control, midp=midp)
         RVAL$data.name <- DNAME
         RVAL$statistic <- x[1]
         RVAL$parameter <- sum(x) * r * T[1]/sum(T * c(1, r))
@@ -63,20 +63,58 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 minlike="Exact two-sided Poisson test (sum of minimum likelihood method)",
                 central="Exact two-sided Poisson test (central method)",
                 blaker="Exact two-sided Poisson test (Blaker's method)")
+        if (midp) methodphrase<-paste0(methodphrase,", mid-p version")
+
         RVAL$method <- methodphrase
     }
     else {
         m <- r * T
-        PVAL <- switch(alternative, less = ppois(x, m), greater = ppois(x - 
-            1, m, lower.tail = FALSE), 
-            two.sided = exactpoissonPval(x,T,r,relErr, tsmethod=tsmethod))
-
-        p.L <- function(x, alpha) {
-            if (x == 0) 
-                0
-            else qgamma(alpha, x)
+        if (midp){
+            if (alternative=="two.sided" & tsmethod!="central") stop("midp=TRUE only available for tsmethod='central'")
+            midp.less<-ppois(x, m)-0.5*dpois(x,m)
+            midp.greater<-ppois(x - 1, m, lower.tail = FALSE)-0.5*dpois(x,m)
+            PVAL <- switch(alternative, 
+                less = midp.less,
+                greater = midp.greater, 
+                two.sided =pmin(rep(1,length(midp.less)), 2*midp.less, 2*midp.greater)) 
+            p.L<-function(x,alpha){
+                if (x==0){
+                    out<- 0
+                } else  {
+                    rootfunc<-function(mu){
+                        # check function without midp correction 
+                        # against usual pois.exact()$conf.int
+                        #1-ppois(x-1,mu) - alpha
+                        # with midp correction
+                        1-ppois(x,mu)+0.5*dpois(x,mu) - alpha
+                    }
+                    out<-uniroot(rootfunc,c(0,qgamma(alpha,x)+1))$root
+                }
+                out
+            }
+            p.U<-function(x,alpha){
+                rootfunc<-function(mu){
+                    # check function without midp correction
+                    # against usual binom.test()$conf.int
+                    #ppois(x,mu) - alpha
+                    # with midp correction
+                    ppois(x,mu)-0.5*dpois(x,mu) - alpha
+                }
+                uniroot(rootfunc,
+                    c(0,qgamma(1 - alpha, x + 1)+1))$root
+            }
+        } else {
+            PVAL <- switch(alternative, 
+                less = ppois(x, m),
+                greater = ppois(x - 1, m, lower.tail = FALSE), 
+                two.sided = exactpoissonPval(x,T,r,relErr, tsmethod=tsmethod))
+            p.L <- function(x, alpha) {
+                if (x == 0) 
+                    0
+                else qgamma(alpha, x)
+            }
+            p.U <- function(x, alpha) qgamma(1 - alpha, x + 1)
         }
-        p.U <- function(x, alpha) qgamma(1 - alpha, x + 1)
 
         if (alternative=="less"){
             CINT<-c(0, p.U(x, 1 - conf.level))
@@ -87,6 +125,7 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 alpha <- (1 - conf.level)/2 
                 CINT<-c(p.L(x, alpha), p.U(x, alpha))
             } else {
+                if (midp) stop("midp=TRUE only available for tsmethod='central'")
                 CINT<-exactpoissonCI(x,tsmethod=tsmethod,conf.level=conf.level)
             }
         }
@@ -104,6 +143,7 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 central="Exact two-sided Poisson test (central method)",
                 blaker="Exact two-sided Poisson test (Blaker's method)")
 
+        if (midp) methodphrase<-paste0(methodphrase,", mid-p version")
 
         RVAL<-structure(list(statistic = x, parameter = T, p.value = PVAL, 
             conf.int = CINT, estimate = ESTIMATE, null.value = r, 

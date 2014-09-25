@@ -1,6 +1,8 @@
 exactbinomCI<-function(x, n, tsmethod="minlike",conf.level=.95,tol=.00001,
     pRange=c(1e-10,1-1e-10)){
 
+    ## NOTE: no midp option yet...needs to be coded
+
     ## code is a modification of exact2x2CI
 
     alpha<-1-conf.level
@@ -32,7 +34,8 @@ exactbinomCI<-function(x, n, tsmethod="minlike",conf.level=.95,tol=.00001,
             ## root is the parameter  
             ## where dbinom(xlo,n,root)=dbinom(xhi,n,root)
             ## we can solve this algebraically
-            root<-1/(1+exp((lchoose(n,xhi) - lchoose(n,xlo))/(xhi-xlo)))
+            root<-1/(1+exp((lchoose(n,xhi) - 
+                            lchoose(n,xlo))/(xhi-xlo)))
         } else if (TSmethod=="blaker"){
             ## root is the parameter where the tails are equal, i.e.,
             ## where pbinom(xlo,n,root)=pbinom(xhi-1,n,root,lower.tail=FALSE)

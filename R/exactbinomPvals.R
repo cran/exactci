@@ -1,5 +1,6 @@
 `exactbinomPvals` <-
-function(x,n,p,relErr=1+10^(-7),tsmethod="minlike"){
+function(x,n,p,relErr=1+10^(-7),
+    tsmethod="minlike",midp=FALSE){
 
     np<-length(p)
     if (any(p>1) | any(p<0)) stop("p must be in [0,1]")
@@ -14,15 +15,21 @@ function(x,n,p,relErr=1+10^(-7),tsmethod="minlike"){
             d<-f[X]
             F<-cumsum(f)
             Fbar<-cumsum(f[ns:1])[ns:1]
+            if (midp){
+                F<- F - 0.5*f
+                Fbar<- Fbar - 0.5*f
+            }
             lower<-F[X]
             upper<-Fbar[X]
             if (lower<=upper){
                 if (any(Fbar<=lower*relErr)){
-                    pvals[i]<-lower + max(Fbar[Fbar<=lower*relErr])
+                    pvals[i]<-lower + 
+                      max(Fbar[Fbar<=lower*relErr])
                 } else pvals[i]<-lower
             } else if (upper<lower){
                 if (any(F<=upper*relErr)){
-                    pvals[i]<-upper + max(F[F<=upper*relErr])
+                    pvals[i]<-upper + 
+                      max(F[F<=upper*relErr])
                 } else pvals[i]<-upper
             } 
         }
@@ -30,14 +37,23 @@ function(x,n,p,relErr=1+10^(-7),tsmethod="minlike"){
         for (i in 1:np){
             f<-dbinom(support,n,p[i])
             d<-f[X]
-            pvals[i]<-sum(f[f<=d*relErr])
+            if (midp){
+                pvals[i]<-sum(f[f<=d*relErr])-0.5*d
+            } else {
+                pvals[i]<-sum(f[f<=d*relErr])
+            }
         }   
     } else if (tsmethod=="central"){
         Xlo<-support<=x
         Xhi<-support>=x
         for (i in 1:np){
             f<-dbinom(support,n,p[i])
-            pvals[i]<-2*min(sum(f[Xlo]),sum(f[Xhi]))
+            if (midp){
+                pvals[i]<-2*min(sum(f[Xlo])-0.5*f[X],
+                                sum(f[Xhi])-0.5*f[X])
+            } else {
+                pvals[i]<-2*min(sum(f[Xlo]),sum(f[Xhi]))
+            }
         }
     }
     pvals<-pmin(1,pvals)

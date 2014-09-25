@@ -14,8 +14,8 @@ p-values.
 \tabular{ll}{
 Package: \tab exactci\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2010-01-04\cr
+Version: \tab 1.3-0\cr
+Date: \tab 2014-05-14\cr
 License: \tab GPL2\cr
 LazyLoad: \tab yes\cr
 }
@@ -31,11 +31,13 @@ are \code{\link{binom.exact}} and \code{\link{poisson.exact}} which follow the s
 as  \code{binom.test} and \code{poisson.test} except have the option 'tsmethod'
 to define the two-sided method for calculating the p-values, and give matching 
 confidence intervals (i.e., ones that come from the inversion of the p-values). 
+
+The package also has options for mid-p values.
 }
 \author{
-M.P. Fay
+Michael P. Fay
 
-Maintainer: Mike Fay <mfay@niaid.nih.gov>
+Maintainer: Michael P. Fay <mfay@niaid.nih.gov>
 }
 \references{
 Blaker, H. (2000) Confidence curves and improved exact confidence intervals for discrete distributions.

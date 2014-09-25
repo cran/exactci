@@ -1,2 +1,5 @@
-export(exactbinomPvals,exactbinomCI,exactbinomPlot,binom.exact,exactpoissonPlot,exactpoissonPvals,exactpoissonPval,exactpoissonCI,poisson.exact)
+export(exactbinomPvals,exactbinomCI,exactbinomPlot,binom.exact,
+    exactpoissonPlot,exactpoissonPvals,exactpoissonPval,
+    exactpoissonCI,poisson.exact,powerBinom)
+importFrom(ssanv,uniroot.integer)
 

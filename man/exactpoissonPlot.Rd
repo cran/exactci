@@ -23,7 +23,8 @@ exactpoissonPlot(x,
     relErr=1 + 10^(-7), 
     conf.level=.95,
     alphaline=TRUE,
-    newplot=TRUE,...)
+    newplot=TRUE,
+    midp=FALSE,...)
 }
 \arguments{
   \item{x}{number of events. A vector of length one or two}
@@ -41,6 +42,7 @@ exactpoissonPlot(x,
   \item{conf.level}{confidence level for use when doci=TRUE}
 \item{alphaline}{logical, if doci=TRUE should line be drawn at significance level} 
  \item{newplot}{logical,start a new plot?}
+\item{midp}{logical, use mid-p for p-values? Not available for tsmethod='blaker' or 'minlike'}
   \item{\dots}{values passed to plot, points, or lines statement}
 }
 %\details{}
