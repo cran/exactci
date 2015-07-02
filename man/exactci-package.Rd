@@ -14,8 +14,8 @@ p-values.
 \tabular{ll}{
 Package: \tab exactci\cr
 Type: \tab Package\cr
-Version: \tab 1.3-0\cr
-Date: \tab 2014-05-14\cr
+Version: \tab 1.3-1\cr
+Date: \tab 2015-07-02\cr
 License: \tab GPL2\cr
 LazyLoad: \tab yes\cr
 }

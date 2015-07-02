@@ -3,3 +3,8 @@ export(exactbinomPvals,exactbinomCI,exactbinomPlot,binom.exact,
     exactpoissonCI,poisson.exact,powerBinom)
 importFrom(ssanv,uniroot.integer)
 
+importFrom("graphics", "points", "plot", "lines")
+importFrom("stats", "pbinom", "dbinom", "qbinom", "uniroot", "qbeta", "dpois", "ppois", "qpois", "qgamma")
+importFrom("utils", "flush.console")
+
+
