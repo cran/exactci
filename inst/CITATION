@@ -8,7 +8,7 @@ citEntry(entry="Article",
   volume       = "2",
   number       = "1",  
   pages        = "53--58",
-  url ="http://journal.r-project.org/",
+  url ="https://journal.R-project.org/",
   textVersion  ="Fay MP (2010). Two-sided Exact Tests and Matching Confidence Intervals for Discrete Data.  R Journal 2(1):53-58.",
   header = ""
 )

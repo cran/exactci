@@ -72,14 +72,16 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
         if (midp){
             if (alternative=="two.sided" & tsmethod!="central") stop("midp=TRUE only available for tsmethod='central'")
             midp.less<-ppois(x, m)-0.5*dpois(x,m)
-            midp.greater<-ppois(x - 1, m, lower.tail = FALSE)-0.5*dpois(x,m)
+            midp.greater<-ppois(x - 1, m, 
+                lower.tail = FALSE)-0.5*dpois(x,m)
             PVAL <- switch(alternative, 
                 less = midp.less,
                 greater = midp.greater, 
-                two.sided =pmin(rep(1,length(midp.less)), 2*midp.less, 2*midp.greater)) 
+                two.sided =pmin(rep(1,length(midp.less)), 
+                           2*midp.less, 2*midp.greater)) 
             p.L<-function(x,alpha){
                 if (x==0){
-                    out<- 0
+                    out<-0
                 } else  {
                     rootfunc<-function(mu){
                         # check function without midp correction 
@@ -93,15 +95,19 @@ poisson.exact<-function (x, T = 1, r = 1, alternative = c("two.sided", "less",
                 out
             }
             p.U<-function(x,alpha){
-                rootfunc<-function(mu){
-                    # check function without midp correction
-                    # against usual binom.test()$conf.int
-                    #ppois(x,mu) - alpha
-                    # with midp correction
-                    ppois(x,mu)-0.5*dpois(x,mu) - alpha
+                if (x==0 & alpha>=0.5){
+                    out<-0
+                } else {
+                    rootfunc<-function(mu){
+                        # check function without midp correction
+                        # against usual binom.test()$conf.int
+                        #ppois(x,mu) - alpha
+                        # with midp correction
+                        ppois(x,mu)-0.5*dpois(x,mu) - alpha
+                    }
+                    out<-uniroot(rootfunc,
+                        c(0,qgamma(1 - alpha, x + 1)+1))$root
                 }
-                uniroot(rootfunc,
-                    c(0,qgamma(1 - alpha, x + 1)+1))$root
             }
         } else {
             PVAL <- switch(alternative, 

@@ -2,44 +2,53 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
     pRange=c(1e-10,1-1e-10)){
 
     ## code is a modification of exact2x2CI
-
     alpha<-1-conf.level
-    # can make tol for uniroot functions less than tol if you want, edit urtol
+    # can make tol for uniroot functions less than 
+    # tol if you want, edit urtol
     # but it is not helpful for the current algorithm
     urtol<-tol   
 
-       ## since there is no upper limit for Poisson we need to find n=xmax
+        ## since there is no upper limit for Poisson 
+        ## we need to find n=xmax
         ## such that at some large value of the parameter, say 
         ## the 1-alpha/100 upper confidence limit,  
         ## the tail is much less than alpha, say alpha/100
-        ## this is arbitrary, there is probably room for improvement
+        ## this is arbitrary, there is probably room 
+        ## for improvement
         n<- qpois(1-alpha/100,qgamma(1-alpha/100,x))   
  
 
-    ## the intercept function finds the places where there is a jump 
+    ## the intercept function finds the places 
+    ## where there is a jump 
     ## in the evidence (i.e., p-value) function
     intercept<-function(xlo,xhi,TSmethod=tsmethod){
         if (TSmethod=="minlike"){
             ## root is the parameter  
             ## where dpois(xlo,root)=dpois(xhi,root)
             ## we can solve this algebraically
-            root<-exp( (lfactorial(xhi) - lfactorial(xlo))/(xhi-xlo) )
+            root<-exp( (lfactorial(xhi) - lfactorial(xlo))/
+                        (xhi-xlo) )
         } else if (TSmethod=="blaker"){
-            ## root is the parameter where the tails are equal, i.e.,
-            ## where ppois(xlo,root)=ppois(xhi-1,root,lower.tail=FALSE)
+            ## root is the parameter where the 
+            ## tails are equal, i.e.,
+            ## where ppois(xlo,root)=
+            ##      ppois(xhi-1,root,lower.tail=FALSE)
             ## we solve using uniroot
             rootfunc<-function(beta){
                 nb<-length(beta)
                 out<-rep(NA,nb)
                 for (i in 1:nb){
-                    out[i]<- ppois(xlo,beta[i]) - ppois(xhi-1,beta[i],lower.tail=FALSE)
+                    out[i]<- ppois(xlo,beta[i]) - 
+                       ppois(xhi-1,beta[i],lower.tail=FALSE)
                 }
                 out   
             }
-            ## note that for intergers,i, ppois(i-1,x,lower.tail=FALSE)=pgamma(x,a)
+            ## note that for intergers,i, 
+            ## ppois(i-1,x,lower.tail=FALSE)=pgamma(x,a)
             ## so we use qgamma to get range from pRange
-            root<-uniroot(rootfunc,c(qgamma(pRange[1],xlo),qgamma(pRange[2],xhi)),tol=urtol )$root
-
+            root<-uniroot(rootfunc,
+                c(qgamma(pRange[1],xlo),
+                  qgamma(pRange[2],xhi)),tol=urtol )$root
         } else {
             stop("method must equal 'minlike' or 'blaker' ")
         }
@@ -63,7 +72,8 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
         list(p=P,estimate=estimate,bndlo=L,bndhi=U)
     }
 
-   refine<-function(xlo,xhi,RRange,NDIV=100,maxiter=50,limit="upper"){
+   refine<-function(xlo,xhi,RRange,NDIV=100,
+                      maxiter=50,limit="upper"){
         getCLbnds<-function(b){
             nb<-length(b$bndhi)
             HI<-max(b$bndhi)
@@ -82,19 +92,23 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
                 CLbnds<-c(NA,NA)
                 if (limit=="upper"){
                     if (any(b$bndlo>alpha)){
-                        CLbnds[1]<-max( b$p[2:(nb+1)][b$bndlo>alpha] )
+                        CLbnds[1]<-max( 
+                              b$p[2:(nb+1)][b$bndlo>alpha] )
                     } else { 
                         CLbnds[1]<- min(b$p)
                     }
-                    CLbnds[2]<- max( b$p[2:(nb+1)][b$bndhi>alpha])
+                    CLbnds[2]<- max( 
+                              b$p[2:(nb+1)][b$bndhi>alpha])
                 } else {
                 # limit=lower
                     if (any(b$bndlo>alpha)){
-                        CLbnds[2]<-min( b$p[1:nb][b$bndlo>alpha] )
+                        CLbnds[2]<-min( 
+                              b$p[1:nb][b$bndlo>alpha] )
                     } else {
                         CLbnds[2]<-max(b$p)
                     }
-                    CLbnds[1]<-min( b$p[1:nb][b$bndhi>alpha] )
+                    CLbnds[1]<-min( 
+                              b$p[1:nb][b$bndhi>alpha] )
                 }
                 continue<-TRUE
             }
@@ -108,7 +122,8 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
             for (i in 1:maxiter){
                 b<-Bnds(xlo,xhi,RRANGE,ndiv=NDIV) 
                 clb<-getCLbnds(b)
-                if (!clb$continue | (clb$continue & is.null(clb$CLbnds))) break()
+                if (!clb$continue | 
+                   (clb$continue & is.null(clb$CLbnds))) break()
                 RRANGE<-clb$CLbnds
                 if (RRANGE[2]-RRANGE[1]>tol){ 
                     NDIV<-2*NDIV
@@ -129,11 +144,13 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
         lower.prec<-c(0,0)
     }
     if (is.na(CINT[2])){
-        ## since there is no upper limit for Poisson we need to find n=xmax
+        ## since there is no upper limit for Poisson we 
+        ## need to find n=xmax
         ## such that at some large value of the parameter, say 
         ## the 1-alpha/100 upper confidence limit,  
         ## the tail is much less than alpha, say alpha/100
-        ## this is arbitrary, there is probably room for improvement
+        ## this is arbitrary, there is probably room 
+        ## for improvement
         ## Sept 21,2012: fixed error, gives n=0 if x=0
         if (x==0){ gammaParm<- 1
         } else gammaParm<-x
@@ -150,14 +167,16 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
                     stop("original F greater than alpha, rewrite n<- code") 
                 }
             } else if (i>1){
-                rout<- refine(x,xgreater[i-1],c(ints[i],ints[i-1]),limit="upper")
+                rout<- refine(x,xgreater[i-1],
+                       c(ints[i],ints[i-1]),limit="upper")
                if (!rout$continue){ 
                     CINT[2]<-rout$CLbnds[2]
                     upper.prec<-rout$CLbnds
                     break()
                 } else if (i==ngreater){
                     CINT[2]<-ints[i]
-                    upper.prec<-c(ints[i]-urtol/2,ints[i]+urtol/2)
+                    upper.prec<-c(ints[i]-urtol/2,
+                                  ints[i]+urtol/2)
                 }
             }
         }
@@ -172,36 +191,63 @@ exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
             if (i==1){
                 if (Fbar>alpha){
                     rootfunc<-function(p){
-                        alpha - exactpoissonPvals(x,p,tsmethod=tsmethod)$pvals
+                        alpha - exactpoissonPvals(x,p,
+                                  tsmethod=tsmethod)$pvals
                      }
 
                     if (rootfunc(rRange[1])<0) stop("very small rate, modify pRange")
-                    CINT[1]<-uniroot(rootfunc,c(rRange[1],ints[i]),tol=urtol)$root
-                    lower.prec<-c(CINT[1]-urtol/2,CINT[1]+urtol/2)
+                    CINT[1]<-uniroot(rootfunc,
+                          c(rRange[1],ints[i]),tol=urtol)$root
+                    lower.prec<-c(CINT[1]-urtol/2,
+                                  CINT[1]+urtol/2)
                     break()
-                } else if (F==alpha){
+                } else {
+                # Sept 26, 2017: Fix error, previously had: 
+                # else if (F==alpha){
+                # But it needs to be (as above): else {
                     CINT[1]<-ints[i]
-                    lower.prec<-c(CINT[1]-urtol/2,CINT[1]+urtol/2)
+                    lower.prec<-c(CINT[1]-urtol/2, 
+                                  CINT[1]+urtol/2)
                     break()
                 }
             } else if (i>1){
-                rout<- refine(xless[i-1],x,c(ints[i-1],ints[i]),limit="lower") 
+                rout<- refine(xless[i-1],x,
+                      c(ints[i-1],ints[i]),limit="lower") 
                 if (!rout$continue){ 
                     CINT[1]<-rout$CLbnds[1]
                     lower.prec<-rout$CLbnds
                     break()
                 } else if (i==nless){
                     CINT[1]<-ints[i]
-                    lower.prec<-c(ints[i]-urtol/2,ints[i]+urtol/2)
+                    lower.prec<-c(ints[i]-urtol/2,
+                                  ints[i]+urtol/2)
                 }
             }
         }
     }
-    attr(CINT,"conf.limit.prec")<-list(lower=lower.prec,upper=upper.prec)
+    attr(CINT,"conf.limit.prec")<-list(lower=lower.prec,
+                                       upper=upper.prec)
     # round to the digit above tol level
     CINT<-round(CINT,floor(-log10(tol))-1)
     CINT
 }
 
 #exactpoissonCI(5,tsmethod="minlike")
-#exactpoissonCI(0,tsmethod="blaker")
+#exactpoissonCI(1,tsmethod="minlike",conf.level=.366)
+#exactpoissonCI(1,tsmethod="blaker",conf.level=.49)
+
+### Check answers for x=1
+###
+#theta<-40:1050/1000
+#pvalb<-cib<-pvalm<-cim<-rep(NA,length(theta))
+#for (i in 1:length(theta)){
+# pvalm[i]<-exactpoissonPvals(1,theta[i],tsmethod="minlike")$pvals
+# cim[i]<-exactpoissonCI(1,tsmethod="minlike",conf.level=1-pval[i])[1]
+# pvalb[i]<-exactpoissonPvals(1,theta[i],tsmethod="blaker")$pvals
+# cib[i]<-exactpoissonCI(1,tsmethod="blaker",conf.level=1-pval[i])[1]
+#}
+#par(mfrow=c(2,2))
+#plot(theta,pvalm,main="minlike")
+#plot(theta,pvalb,main="blaker")
+#plot(theta,cim)
+#plot(theta,cib)

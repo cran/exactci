@@ -1,6 +1,18 @@
 powerBinom<-function(n=NULL, p0=0.5, p1=NULL, sig.level=0.05, power=NULL, alternative=c("two.sided","one.sided"),
     strict=FALSE,type=c("standard","cilength","obs1ormore"),cilength=NULL,conf.level=0.95,direction=c("greater","less"),control=binomControl(),...){
-
+    # do some checks
+    zeroOneCheck<-function(x){
+        vname<- deparse(substitute(x))
+        stopmessage<- paste(vname," must be between 0 and 1")
+        if (!is.null(x)){
+          if (x>1 | x<0) stop(stopmessage)
+        }
+    }
+    zeroOneCheck(p0)
+    zeroOneCheck(p1)
+    zeroOneCheck(sig.level)
+    zeroOneCheck(power)
+   
     type<-match.arg(type)
     direction<-match.arg(direction)
     # not sure why this is better than list(...), but used in data.frame 

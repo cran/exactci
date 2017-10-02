@@ -59,6 +59,11 @@ binom.exact<-function (x, n, p = 0.5,
         p.L<-function(x,alpha){
             if (x==0){
                 out<- 0
+           } else if (x==n & alpha>=0.5){
+                # to see this, look at limit as 
+                # alpha approaches .5
+                # without this there will be an error
+                out<-1
            } else  {
                 rootfunc<-function(p){
                     # check function without midp correction
@@ -75,7 +80,9 @@ binom.exact<-function (x, n, p = 0.5,
         p.U<-function(x,alpha){
             if (x==n){
                 out<-1
-            } else  {
+            } else if (x==0 & alpha>=0.5) {
+                out<-0
+            } else {
                 rootfunc<-function(p){
                     # check function without midp correction 
                     # against usual binom.test()$conf.int
