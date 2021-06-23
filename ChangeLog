@@ -1,6 +1,18 @@
+1.4-2
+-edited reference to website in vignette. 
+
+1.4-1
+-Added DOI for Fay (2010) to DESCRIPTION. Put note about website under reconstruction and not available in vignette.
+
+1.4-0
+- Rewrote the exactpoissonCI function to fix a bug that was introduced in version 1.3-3 (Thanks to Robert Scott for letting me know). Additionally, the algorithm was changed using ideas from Klaschka and Reiczigel (2020, Computational Statistics). Added a test folder and another vignette describing the new algorithm.
+
+
 1.3-3
 - Add checks to powerBinom so p0,p1, sign.level and power must be between 0 and 1.
 - Fix exactpoissonCI to give correct confidence intervals when x=1 and conf.level<0.50. Thanks to Qiansheng Zhu for pointing out this problem.
+
+
 1.3-2
 - Fix so that midp=TRUE with one-sided conf.level<=.5 does not give error.
 

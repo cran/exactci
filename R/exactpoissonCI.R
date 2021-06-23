@@ -1,251 +1,263 @@
 exactpoissonCI<-function(x, tsmethod="minlike",conf.level=.95,tol=.00001,
     pRange=c(1e-10,1-1e-10)){
-
-    ## code is a modification of exact2x2CI
-    alpha<-1-conf.level
-    # can make tol for uniroot functions less than 
-    # tol if you want, edit urtol
-    # but it is not helpful for the current algorithm
-    urtol<-tol   
-
-        ## since there is no upper limit for Poisson 
-        ## we need to find n=xmax
-        ## such that at some large value of the parameter, say 
-        ## the 1-alpha/100 upper confidence limit,  
-        ## the tail is much less than alpha, say alpha/100
-        ## this is arbitrary, there is probably room 
-        ## for improvement
-        n<- qpois(1-alpha/100,qgamma(1-alpha/100,x))   
- 
-
-    ## the intercept function finds the places 
-    ## where there is a jump 
-    ## in the evidence (i.e., p-value) function
-    intercept<-function(xlo,xhi,TSmethod=tsmethod){
-        if (TSmethod=="minlike"){
-            ## root is the parameter  
-            ## where dpois(xlo,root)=dpois(xhi,root)
-            ## we can solve this algebraically
-            root<-exp( (lfactorial(xhi) - lfactorial(xlo))/
-                        (xhi-xlo) )
-        } else if (TSmethod=="blaker"){
-            ## root is the parameter where the 
-            ## tails are equal, i.e.,
-            ## where ppois(xlo,root)=
-            ##      ppois(xhi-1,root,lower.tail=FALSE)
-            ## we solve using uniroot
-            rootfunc<-function(beta){
-                nb<-length(beta)
-                out<-rep(NA,nb)
-                for (i in 1:nb){
-                    out[i]<- ppois(xlo,beta[i]) - 
-                       ppois(xhi-1,beta[i],lower.tail=FALSE)
-                }
-                out   
+    if (conf.level<=0 | conf.level>=1) stop("conf.level must be 0<conf.level<1")
+    # function to calculate theta tilde a,b
+    # jumps for minlike p-value function
+    ttheta<-function(a,b){ exp( (lfactorial(b) - lfactorial(a))/
+                                  (b-a) ) }
+    
+    # function to calculate theta hat xlo, xhi
+    # jumps for blaker p-value function
+    htheta<-function(xlo,xhi, Tol=tol, PvalRange=pRange){
+      ## root is the parameter where the 
+      ## tails are equal, i.e.,
+      ## where ppois(xlo,root)=
+      ##      ppois(xhi-1,root,lower.tail=FALSE)
+      ## we solve using uniroot
+      rootfunc<-function(beta){
+        ppois(xlo,beta) - 
+          ppois(xhi-1,beta,lower.tail=FALSE)
+      }
+      ## note that for intergers,i, 
+      ## ppois(i-1,x,lower.tail=FALSE)=pgamma(x,a)
+      ## so we use qgamma to get range from pvalRange
+      root<-uniroot(rootfunc,
+                    c(qgamma(PvalRange[1],xlo),
+                      qgamma(PvalRange[2],xhi)),tol=Tol)$root
+      
+      root
+    }
+    exactpoissonCI.minlike<-function(x, alpha=1-conf.level, Tol=tol){
+      
+      ##################
+      # upper limit
+      #################
+      # no need to calculate p-value for ttheta(x,x+1), it is always 1
+      j<-1
+      pval.hi<-1 
+      while (pval.hi>alpha){
+        j<- j+1
+        pval.hi<- exactpoissonPval(x,r=ttheta(x,x+j), tsmethod="minlike")
+      }
+      # exit the loop at the first pval.hi<=alpha
+      # so go back one
+      j<- j-1
+      upperCL<- ttheta(x,x+j)
+      ###################
+      # lower limit
+      ###################
+      if (x==0){
+        lowerCL<-0
+      } else {
+        # for each j, there is an interval
+        # ttheta(x-j,x) <= theta0 < ttheta(x-j+1,x)
+        # we need to calculate the p-value at each end 
+        # of the interval
+        # let those two p-value be 
+        # pval.lowLeft and pval.lowRight
+        #
+        # for j=1
+        # ttheta(x-1,x)=x
+        # and pval.lowLeft=pm(x,x)=1 = pval.lowRight
+        tthetaLeft<- x
+        pval.lowLeft<- 1
+        for (j in 2:(x+1)){
+          # to get pval.lowRight, take the previous pval.lowLeft and subtract 
+          #  f(x-j+1;theta=ttheta(x-j+1,x))
+          # previous tthetaLeft becomes tthetaRight
+          tthetaRight<- tthetaLeft
+          pval.lowRight<- pval.lowLeft - dpois(x-j+1,tthetaRight)
+          if (x-j<0){
+            # if x-j<0, then F(x-j;theta0)=0 and we just need to 
+            # find theta0 so that Fbar(x, theta0)=alpha
+            # Fbar(x,B) =ppois(x-1, B, lower.tail=FALSE) = alpha
+            # when  qgamma(alpha,x,1) = B
+            # so we get the lower confidence limit 
+            # by
+            lowerCL<- qgamma(alpha, x, 1)
+            break()
+          } 
+          tthetaLeft<- ttheta(x-j,x)
+          pval.lowLeft<- exactpoissonPval(x,r=tthetaLeft, tsmethod="minlike")
+          if (pval.lowLeft==alpha){
+            lowerCL<- tthetaLeft
+            break()
+          } else if (pval.lowLeft<alpha & pval.lowRight>alpha){
+            # assume p-value monotonically increasing and use uniroot
+            # to find when pval=alpha
+            rootfunc<-function(R, Alpha=alpha){
+              exactpoissonPval(x,r=R, tsmethod="minlike") - Alpha
             }
-            ## note that for intergers,i, 
-            ## ppois(i-1,x,lower.tail=FALSE)=pgamma(x,a)
-            ## so we use qgamma to get range from pRange
-            root<-uniroot(rootfunc,
-                c(qgamma(pRange[1],xlo),
-                  qgamma(pRange[2],xhi)),tol=urtol )$root
+            lowerCL<-uniroot(rootfunc, lower=tthetaLeft, upper=tthetaRight-Tol, tol=Tol)$root
+            break()
+          } else if (pval.lowLeft<alpha & pval.lowRight<=alpha){
+            # assume p-value increases from pval.lowLeft to pval.lowRight
+            # if pval.lowRight<=alpha, then tthetaRight+epsilon > alpha
+            # and tthetaRight+epsilon= tthetaRight=lowerCL
+            lowerCL<- tthetaRight
+            break()
+          } # else continue to next j
+        }
+        
+      }
+      
+      
+      c(lowerCL,upperCL)
+    }
+    
+
+    exactpoissonCI.blaker<-function(x, alpha=1-conf.level, Tol=tol,pvalRange=c(1e-10,1-1e-10)){
+      
+      ##################
+      # lower limit
+      #################
+      # 
+      if (x==0){
+        lowerCL<-0
+      } else {
+        # p-value function is piecewise continuous
+        # for each interval let the range of the interval be 
+        # hthetaLeft = htheta(x-j,x)   to 
+        # hthetaRight = htheta(x-j+1,x) - epsilon
+        # with p-values at those ends 
+        # pval.loLeft ----pval.loRight
+        # for the lower p-values (for theta0<x)
+        # the p-values are strictly increasing in the 
+        # piecewise continuous region 
+        # (conjecture for now, but all plots show this)
+        # at j=1 the left and right p-value is 1
+        pval.loLeft<-pval.loRight<-1
+        j<-1
+        hthetaRight<- htheta(x-j+1,x)
+        hthetaLeft<- htheta(x-j,x)
+        
+        
+        for (j in 2:(x+1)){
+          # calculate hthetaRight = previous j value's hthetaLeft
+          hthetaRight<- hthetaLeft
+          # take previous j values's pvalue and subtract off pmf
+          # to get the pval.loRight
+          pval.loRight<- pval.loLeft - dpois(x-j+1,hthetaRight)
+          if (pval.loRight<=alpha){
+            lowerCL<- hthetaRight
+            break()
+          }
+          if (x-j<0){
+            # when x-j<0 and pval.loRight>alpha, 
+            # that means ppois(x-j,theta0)=0, so the solution
+            # of the p-value equal to alpha is the value theta0 such that
+            # Fbar(x,theta0) = ppois(x-1, theta0, lower.tail=FALSE) = alpha
+            # So solve for theta0: 
+            # ppois(x-1, theta0, lower.tail=FALSE) = alpha
+            # Do that using relationship between Poisson
+            # and gamma distributions:
+            # ppois(x-1, theta0, lower.tail=FALSE) = alpha
+            # when  qgamma(alpha,x,1) = theta0
+            # so we get the lower confidence limit 
+            # by
+            lowerCL<- qgamma(alpha, x, 1)
+            break()
+          } else {
+            hthetaLeft<- htheta(x-j,x)
+            pval.loLeft<- ppois(x-j, hthetaLeft) + ppois(x-1,hthetaLeft, lower.tail=FALSE)
+            if (pval.loLeft<=alpha){
+              # pval.loLeft<= alpha < pval.loRight
+              # conjectur that piecewise p-value function is monotonic
+              # use uniroot
+              rootfunc<-function(theta0,Alpha=alpha){
+                Alpha - ppois(x-j, theta0) - ppois(x-1,theta0, lower.tail=FALSE)
+              }
+              lowerCL<- uniroot(rootfunc, lower=hthetaLeft, upper=hthetaRight, tol=Tol)$root
+              break()
+            } 
+          } # end x-j>=0 
+        } # end for loop
+      } # end: x>0
+      ###################
+      # upper limit
+      ###################
+      # for the piecewise continuous p-value functions on the upper 
+      # part of the curve (when theta0>x)
+      # let the two bounds on the interval be
+      # hthetaLeft and hthetaRight
+      # and the p-values approaching those ends from within the interval, be 
+      # pval.hiLeft and pval.hiRight
+      # an issue with the upper limits for the Blaker interval is that
+      # the p-value function is not monotonic within these intervals
+      # the p-value function is decreasing until some value, 
+      # say pval.hiMid, then it increases until the end of the interval
+      # We can solve for pval.hiMid by taking the derivative and 
+      # setting that to zero and solving for theta0, and 
+      # it turns out that is equal to one of the ends of the minlike interval
+      # thus we have
+      # hthetaLeft < hthetaMid < hthetaRight
+      #    and  (when the p-values<1)
+      # pval.hiLeft > pval.hiMid < pval.hiRight
+      pval.hiMid<-pval.hiLeft<- 1
+      pval.hiRight<-  1
+      j<-1
+      hthetaRight<- htheta(x,x+j)
+      while (pval.hiMid>alpha){
+        hthetaLeft<- hthetaRight
+        pval.hiLeft<- pval.hiRight - dpois(x+j, hthetaLeft)
+        hthetaMid<- ttheta(x,x+j)
+        j<- j+1
+        hthetaRight<- htheta(x,x+j)
+        pval.hiMid<- ppois(x, hthetaMid) + ppois(x+j-1, hthetaMid, lower.tail=FALSE)
+        pval.hiRight<- ppois(x, hthetaRight) + ppois(x+j-1, hthetaRight, lower.tail=FALSE)   
+      }
+      # after while loop, pval.hiMid<=alpha
+      if (pval.hiMid==alpha){
+        upperCL<- hthetaMid
+      } else if (pval.hiLeft< alpha){
+        # since 
+        # pval.hiMid < pval.hiRight < pval.hiLeft
+        # if pval.hiLeft< alpha
+        upperCL<- hthetaLeft
+      } else if (pval.hiRight==alpha){
+        upperCL<- hthetaRight
+      } else if (pval.hiLeft>alpha){
+        if (pval.hiRight>alpha){
+          # pval.hiMid < alpha < pval.hiRight
+          upperCL<-hthetaRight
         } else {
-            stop("method must equal 'minlike' or 'blaker' ")
+          # pval.hiRight < alpha < pval.hiLeft
+          rootfunc<-function(theta0, Alpha=alpha){
+            Alpha -  ppois(x, theta0) - ppois(x+j-1, theta0, lower.tail=FALSE) 
+          }
+          upperCL<-uniroot(rootfunc, lower=hthetaLeft, upper=hthetaMid, tol=Tol)$root
         }
-        root
+      } 
+      c(lowerCL,upperCL)
     }
-
-    # get upper and lower bounds for p-value within range=pRange
-    # divide it into ndiv equal pieces and get the bounds within 
-    # each piece
-    rRange<-c(qgamma(min(pRange),0),qgamma(max(pRange),n))
-
-    Bnds<-function(xlo,xhi,rRange,ndiv=1){
-        plo<-min(rRange)
-        phi<-max(rRange)
-        P<- plo + (phi-plo)*((0:ndiv)/ndiv)
-        F<- ppois(xlo,P,lower.tail=TRUE)
-        Fbar<-ppois(xhi-1,P,lower.tail=FALSE)
-        estimate<- F+Fbar
-        L<- F[-1] + Fbar[-(ndiv+1)]
-        U<- F[-(ndiv+1)] + Fbar[-1]
-        list(p=P,estimate=estimate,bndlo=L,bndhi=U)
+    
+    ##########################################
+    # end of function definitions
+    ##########################################
+    if (tsmethod=="minlike"){
+      CINT<-exactpoissonCI.minlike(x)
+    } else if (tsmethod=="blaker"){
+      CINT<-exactpoissonCI.blaker(x)
     }
-
-   refine<-function(xlo,xhi,RRange,NDIV=100,
-                      maxiter=50,limit="upper"){
-        getCLbnds<-function(b){
-            nb<-length(b$bndhi)
-            HI<-max(b$bndhi)
-            LO<-min(b$bndlo)
-            if (HI<=alpha){
-                CLbnds<-NULL
-                continue<-TRUE
-            } else if (LO>alpha){
-                if (limit=="upper"){
-                    CLbnds<-c(max(b$p)-tol/2,max(b$p)+tol/2)
-                } else {
-                    CLbnds<-c(min(b$p)-tol/2,min(b$p)+tol/2)
-                }
-                continue<-FALSE
-            } else {
-                CLbnds<-c(NA,NA)
-                if (limit=="upper"){
-                    if (any(b$bndlo>alpha)){
-                        CLbnds[1]<-max( 
-                              b$p[2:(nb+1)][b$bndlo>alpha] )
-                    } else { 
-                        CLbnds[1]<- min(b$p)
-                    }
-                    CLbnds[2]<- max( 
-                              b$p[2:(nb+1)][b$bndhi>alpha])
-                } else {
-                # limit=lower
-                    if (any(b$bndlo>alpha)){
-                        CLbnds[2]<-min( 
-                              b$p[1:nb][b$bndlo>alpha] )
-                    } else {
-                        CLbnds[2]<-max(b$p)
-                    }
-                    CLbnds[1]<-min( 
-                              b$p[1:nb][b$bndhi>alpha] )
-                }
-                continue<-TRUE
-            }
-            out<-list(CLbnds=CLbnds,continue=continue)
-            out
-        } # end of getCLbnds
-        b<-Bnds(xlo,xhi,RRange,ndiv=1)
-        clb<-getCLbnds(b)     
-        if (!is.null(clb$CLbnds) & clb$continue){
-            RRANGE<-clb$CLbnds
-            for (i in 1:maxiter){
-                b<-Bnds(xlo,xhi,RRANGE,ndiv=NDIV) 
-                clb<-getCLbnds(b)
-                if (!clb$continue | 
-                   (clb$continue & is.null(clb$CLbnds))) break()
-                RRANGE<-clb$CLbnds
-                if (RRANGE[2]-RRANGE[1]>tol){ 
-                    NDIV<-2*NDIV
-                    if (i==maxiter){
-                        warning("Could not estimate confidence interval to within tol level, see conf.limit.prec attr of conf.int")
-                    }
-                } else if (RRANGE[2]-RRANGE[1]<=tol){
-                    clb$continue<-FALSE
-                    break()
-                }
-            }
-        }
-        clb
-    } # end refine
-    CINT<-c(NA,NA)
-    if (x==0){
-        CINT[1]<-0
-        lower.prec<-c(0,0)
-    }
-    if (is.na(CINT[2])){
-        ## since there is no upper limit for Poisson we 
-        ## need to find n=xmax
-        ## such that at some large value of the parameter, say 
-        ## the 1-alpha/100 upper confidence limit,  
-        ## the tail is much less than alpha, say alpha/100
-        ## this is arbitrary, there is probably room 
-        ## for improvement
-        ## Sept 21,2012: fixed error, gives n=0 if x=0
-        if (x==0){ gammaParm<- 1
-        } else gammaParm<-x
-        n<- qpois(1-alpha/100,qgamma(1-alpha/100,gammaParm))   
-        xgreater<-n:(x+1)
-        ngreater<- length(xgreater)
-        ints<-rep(NA,ngreater)
-        #bndlo<-bndhi<-pend1<-pend2<-pend1<-pend2<-rep(NA,ngreater)
-        for (i in 1:ngreater){
-            ints[i]<-intercept(x,xgreater[i])
-            F<-ppois(x,ints[i],lower.tail=TRUE)
-            if (i==1){
-                if (F>=alpha){
-                    stop("original F greater than alpha, rewrite n<- code") 
-                }
-            } else if (i>1){
-                rout<- refine(x,xgreater[i-1],
-                       c(ints[i],ints[i-1]),limit="upper")
-               if (!rout$continue){ 
-                    CINT[2]<-rout$CLbnds[2]
-                    upper.prec<-rout$CLbnds
-                    break()
-                } else if (i==ngreater){
-                    CINT[2]<-ints[i]
-                    upper.prec<-c(ints[i]-urtol/2,
-                                  ints[i]+urtol/2)
-                }
-            }
-        }
-    }
-    if (is.na(CINT[1])){
-        xless<-0:(x-1)
-        nless<- length(xless)
-        ints<-rep(NA,nless)
-        for (i in 1:nless){
-            ints[i]<-intercept(xless[i],x)
-            Fbar<-ppois(x-1,ints[i],lower.tail=FALSE)
-            if (i==1){
-                if (Fbar>alpha){
-                    rootfunc<-function(p){
-                        alpha - exactpoissonPvals(x,p,
-                                  tsmethod=tsmethod)$pvals
-                     }
-
-                    if (rootfunc(rRange[1])<0) stop("very small rate, modify pRange")
-                    CINT[1]<-uniroot(rootfunc,
-                          c(rRange[1],ints[i]),tol=urtol)$root
-                    lower.prec<-c(CINT[1]-urtol/2,
-                                  CINT[1]+urtol/2)
-                    break()
-                } else {
-                # Sept 26, 2017: Fix error, previously had: 
-                # else if (F==alpha){
-                # But it needs to be (as above): else {
-                    CINT[1]<-ints[i]
-                    lower.prec<-c(CINT[1]-urtol/2, 
-                                  CINT[1]+urtol/2)
-                    break()
-                }
-            } else if (i>1){
-                rout<- refine(xless[i-1],x,
-                      c(ints[i-1],ints[i]),limit="lower") 
-                if (!rout$continue){ 
-                    CINT[1]<-rout$CLbnds[1]
-                    lower.prec<-rout$CLbnds
-                    break()
-                } else if (i==nless){
-                    CINT[1]<-ints[i]
-                    lower.prec<-c(ints[i]-urtol/2,
-                                  ints[i]+urtol/2)
-                }
-            }
-        }
-    }
-    attr(CINT,"conf.limit.prec")<-list(lower=lower.prec,
-                                       upper=upper.prec)
-    # round to the digit above tol level
-    CINT<-round(CINT,floor(-log10(tol))-1)
     CINT
 }
 
 #exactpoissonCI(5,tsmethod="minlike")
 #exactpoissonCI(1,tsmethod="minlike",conf.level=.366)
-#exactpoissonCI(1,tsmethod="blaker",conf.level=.49)
+#exactpoissonCI(1,tsmethod="blaker",conf.level=.366)
 
 ### Check answers for x=1
 ###
-#theta<-40:1050/1000
+#theta<-40:1250/1000
 #pvalb<-cib<-pvalm<-cim<-rep(NA,length(theta))
 #for (i in 1:length(theta)){
 # pvalm[i]<-exactpoissonPvals(1,theta[i],tsmethod="minlike")$pvals
-# cim[i]<-exactpoissonCI(1,tsmethod="minlike",conf.level=1-pval[i])[1]
+# if (pvalm[i]<1) cim[i]<-exactpoissonCI(1,tsmethod="minlike",conf.level=1-pvalm[i])[1]
 # pvalb[i]<-exactpoissonPvals(1,theta[i],tsmethod="blaker")$pvals
-# cib[i]<-exactpoissonCI(1,tsmethod="blaker",conf.level=1-pval[i])[1]
+# if (pvalb[i]<1) cib[i]<-exactpoissonCI(1,tsmethod="blaker",conf.level=1-pvalb[i])[1]
 #}
+# plot lower Conf Limit (at conf.level=1-pval(theta)), 
+# should get theta=lowerCL, when pval(theta)<1 
 #par(mfrow=c(2,2))
 #plot(theta,pvalm,main="minlike")
 #plot(theta,pvalb,main="blaker")

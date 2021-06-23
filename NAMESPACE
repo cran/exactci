@@ -2,6 +2,7 @@ export(exactbinomPvals,exactbinomCI,exactbinomPlot,binom.exact,
     exactpoissonPlot,exactpoissonPvals,exactpoissonPval,
     exactpoissonCI,poisson.exact,powerBinom)
 importFrom(ssanv,uniroot.integer)
+importFrom("testthat","test_that","test_check","expect_equal","context")
 
 importFrom("graphics", "points", "plot", "lines")
 importFrom("stats", "pbinom", "dbinom", "qbinom", "uniroot", "qbeta", "dpois", "ppois", "qpois", "qgamma")
