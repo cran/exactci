@@ -106,7 +106,7 @@ powerBinom<-function(n=NULL, p0=0.5, p1=NULL, sig.level=0.05, power=NULL, altern
             step.up=TRUE,
             step.power=STEP.POWER,
             pos.side=TRUE,print.steps=control$PRINT.STEPS)$root)
-        if (class(n)=="try-error") stop("increase control$maxn or 
+        if (inherits(n,what="try-error")) stop("increase control$maxn or 
                increase 'cilength' ")
 
 

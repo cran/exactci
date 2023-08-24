@@ -1,3 +1,11 @@
+1.4-4
+- fix CITATION file
+
+1.4-3
+- fixed exactci-package.Rd by deleting DESCRIPTION table
+- in powerBinom.R change if(class(x)=="text") to if(inherits(x,what="text")) as recommended by R check
+- added exact2x2 to Suggests
+
 1.4-2
 -edited reference to website in vignette. 
 

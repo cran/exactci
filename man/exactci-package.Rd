@@ -11,14 +11,6 @@ intervals. There are 3 different methods for defining the two-sided
 p-values.  
 }
 \details{
-\tabular{ll}{
-Package: \tab exactci\cr
-Type: \tab Package\cr
-Version: \tab 1.4-0\cr
-Date: \tab 2021-05-06\cr
-License: \tab GPL2\cr
-LazyLoad: \tab yes\cr
-}
 Although \code{\link{binom.test}} and \code{\link{poisson.test}} give exact 
 tests and confidence intervals, for two-sided tests the confidence intervals (CI) are not formed by inverting 
 the tests. Thus, there may be test-CI inconsistencies whereby the test rejects 
