@@ -1,3 +1,7 @@
+1.4-5
+- switch to Author@R field in DESCRIPTION
+- provide package anchors to links in Rd file
+
 1.4-4
 - fix CITATION file
 

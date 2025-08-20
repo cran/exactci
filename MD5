@@ -1,5 +1,5 @@
-b023ffcbdebb0262396ef4f98a1fd382 *ChangeLog
-ccae5711ee767e404bec11f5b3cfe7fe *DESCRIPTION
+a3e283b5ce2de050c600ad453c75eac6 *ChangeLog
+38a9bae1e874f903b44f2b52aeba4989 *DESCRIPTION
 a2c4d05df68ba92aae82000ec8b7ee94 *NAMESPACE
 174c5e338d98f9f292cdb2554e808c76 *R/binom.exact.R
 1539a1b0afbd8ee3d8277548c3705d3f *R/binomControl.R
@@ -11,14 +11,14 @@ fe00cd60fde14a81a32dc98c57e4a7db *R/exactbinomPvals.R
 42d1d5fa7c6a9c3c2ddac833cec53c2b *R/exactpoissonPvals.R
 8640ac9240fdb3e9f3a5ffc69df0280e *R/poisson.exact.R
 048098ac7a4e3eb5239ae558ff7bef3b *R/powerBinom.R
-5397ebeebfee3f5064a53fbd50c5db21 *build/vignette.rds
+3880fc0e19c3ea5823fd5c3bfb8c165f *build/vignette.rds
 15ce261e4764cdf6d9f65a444b69e68b *inst/CITATION
-575f7bf8c19e433cdc690038682cbe10 *inst/doc/TwoSidedPoissonCIs.R
+5db6588c3dba7b2684fbe2ec6b75ae2a *inst/doc/TwoSidedPoissonCIs.R
 7e12ef2f547acb5e771035725f50d11e *inst/doc/TwoSidedPoissonCIs.Rmd
 5de4bff178c4e1c2d84a51753ac2ec99 *inst/doc/TwoSidedPoissonCIs.html
 1f15b9b91294820fd5899a752b2754e4 *inst/doc/exactci.R
 91c10b32e4fb6e13ad624ae5c52d3703 *inst/doc/exactci.Rnw
-70deb5a4c92396f8f0ccaf99d281e443 *inst/doc/exactci.pdf
+eaad0f8711a75ceff8d005f1b9a68997 *inst/doc/exactci.pdf
 e54fff2b65fbc6b9f71865bb2af65a59 *man/binom.exact.Rd
 0b78b7830a987359307b6a666432ba51 *man/binomControl.Rd
 a3ac50645e49c5b91362444b8b683d5e *man/exactbinomPlot.Rd
@@ -26,7 +26,7 @@ a3ac50645e49c5b91362444b8b683d5e *man/exactbinomPlot.Rd
 1c7d168842d069786b48f908a0a5beb8 *man/exactci-package.Rd
 14e46c2336a5c6bc1af2192d69a81fd5 *man/exactpoissonPlot.Rd
 08d529090cca9309bfa8d88464652b4f *man/poisson.exact.Rd
-5581a5dd5978a9df2de2ae6adde74560 *man/powerBinom.Rd
+5f6be3834a3ca83caf6756731d6ff30c *man/powerBinom.Rd
 715088c9c2049a78c7a1b2110b23c789 *tests/testthat.R
 f2905a696ab3c77b179a13765015bdf6 *tests/testthat/test_poisson.R
 7e12ef2f547acb5e771035725f50d11e *vignettes/TwoSidedPoissonCIs.Rmd

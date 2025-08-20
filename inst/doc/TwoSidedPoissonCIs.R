@@ -177,14 +177,14 @@ for (i in 1:length(X)){
 library(knitr)
 kable(checkData,caption="Compare Results")
 
-## ---- fig.width=8, fig.height=6-----------------------------------------------
+## ----fig.width=8, fig.height=6------------------------------------------------
 library(exactci)
 exactpoissonPlot(8,tsmethod="central", dolog=FALSE, dolines = FALSE, dopoints=TRUE,pch=16,cex=1, col="blue")
 exactpoissonPlot(8,tsmethod="blaker", dolines = FALSE, dopoints=TRUE, newplot=FALSE, col=gray(0.2), pch=16,cex=1.5)
 exactpoissonPlot(8,tsmethod="minlike", dolines = FALSE, dopoints=TRUE, newplot=FALSE, col=gray(0.8), pch=16, cex=.75)
 legend("topright",legend=c("central","minlike","blaker"),pch=c(16,16,16),col=c("blue",gray(.8),gray(.2)))
 
-## ---- fig.width=8, fig.height=6-----------------------------------------------
+## ----fig.width=8, fig.height=6------------------------------------------------
 par(mfrow=c(1,2))
 
 exactpoissonPlot(8,tsmethod="central", dolines = FALSE, dopoints=TRUE,pch=16,cex=1, col="blue",xlim=c(3.5,5.5),ylim=c(.05,.11))

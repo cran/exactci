@@ -62,7 +62,7 @@ further arguments passed to \code{\link{binom.exact} (see details)}
 \details{
 Type='standard' calculates the power to reject the null hypothesis with the parameter p0 on the boundary between the null and alternative. In other words, the null could be either of the three, H0: p=p0 (for alternative='two.sided') or H0: p<=p0 or H0:p>=p0 (for alternative='one.sided'). For one-sided alternatives, p1 determines the alternative (and hence determines the null). For example, p0=.5 and p1=.7 will test H0: p<=0.5 vs H1: p> 0.5. 
 
-Type='cilength' calculates the expected length of the confidence intervals when p=p1. If p1=NULL, then it uses p1=0.5 because this will give the largest CI lengths. For sample size calculations, the n value is found using the \code{\link{uniroot.integer}} function searching the range from control$minn to control$maxn, finding the smallest n that has expected CI length at least as large as cilength.
+Type='cilength' calculates the expected length of the confidence intervals when p=p1. If p1=NULL, then it uses p1=0.5 because this will give the largest CI lengths. For sample size calculations, the n value is found using the \code{\link[ssanv]{uniroot.integer}} function searching the range from control$minn to control$maxn, finding the smallest n that has expected CI length at least as large as cilength.
 
 Type='obs1ormore' calculates sample sizes related to the probability (i.e., the power) to observe at least one success. 
 

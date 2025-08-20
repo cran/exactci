@@ -2,10 +2,12 @@ Package: exactci
 Type: Package
 Title: Exact P-Values and Matching Confidence Intervals for Simple
         Discrete Parametric Cases
-Version: 1.4-4
-Date: 2023-08-24
-Author: Michael P. Fay
-Maintainer: Michael P. Fay <mfay@niaid.nih.gov>
+Version: 1.4-5
+Date: 2025-08-20
+Authors@R: person(given = c("Michael", "P."),
+                    family = "Fay",
+                    role = c("aut", "cre"),
+                    email = "mfay@niaid.nih.gov")
 Depends: stats, ssanv, testthat
 Suggests: rmarkdown, BlakerCI, knitr, exact2x2
 VignetteBuilder: knitr
@@ -13,6 +15,8 @@ Description: Calculates exact tests and confidence intervals for one-sample bino
 License: GPL-3
 LazyLoad: yes
 NeedsCompilation: no
-Packaged: 2023-08-24 13:53:57 UTC; faym
+Packaged: 2025-08-20 19:28:32 UTC; faym
+Author: Michael P. Fay [aut, cre]
+Maintainer: Michael P. Fay <mfay@niaid.nih.gov>
 Repository: CRAN
-Date/Publication: 2023-08-24 14:20:02 UTC
+Date/Publication: 2025-08-20 21:10:01 UTC
